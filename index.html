@@ -379,12 +379,30 @@
       const t = () => translations[language];
 
       function getEvent(now) {
-        const year = new Date(now).getUTCFullYear();
-        const start = Date.UTC(year, 10, 1, 0, 0, 0);
-        const end = Date.UTC(year, 11, 1, 0, 0, 0);
+        // NNN begins and ends at midnight in the visitor's own time zone.
+        const year = new Date(now).getFullYear();
+        const start = new Date(year, 10, 1, 0, 0, 0, 0).getTime();
+        const end = new Date(year, 11, 1, 0, 0, 0, 0).getTime();
         if (now < start) return { year, target: start, phaseKey: "phaseStart" };
         if (now < end) return { year, target: end, phaseKey: "phaseEnd" };
-        return { year: year + 1, target: Date.UTC(year + 1, 10, 1, 0, 0, 0), phaseKey: "phaseStart" };
+        return {
+          year: year + 1,
+          target: new Date(year + 1, 10, 1, 0, 0, 0, 0).getTime(),
+          phaseKey: "phaseStart"
+        };
+      }
+
+      function formatLocalTimestamp(date) {
+        // Use the target date's actual offset, including DST and fractional-hour zones.
+        const offsetMinutes = -date.getTimezoneOffset();
+        const sign = offsetMinutes >= 0 ? "+" : "-";
+        const absoluteOffset = Math.abs(offsetMinutes);
+        const offsetHours = Math.floor(absoluteOffset / 60);
+        const offsetRemainder = absoluteOffset % 60;
+        return date.getFullYear() + "-" +
+          pad(date.getMonth() + 1) + "-" + pad(date.getDate()) + " " +
+          pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds()) +
+          " UTC" + sign + pad(offsetHours) + ":" + pad(offsetRemainder);
       }
 
       function readStatuses(year) {
@@ -558,8 +576,8 @@
       }
 
       function renderCalendars(eventYear, resetHistory = false) {
-        const currentUtcYear = new Date().getUTCFullYear();
-        $("current-calendar-title").textContent = eventYear === currentUtcYear
+        const currentLocalYear = new Date().getFullYear();
+        $("current-calendar-title").textContent = eventYear === currentLocalYear
           ? t().thisYearNovember
           : t().nextYearNovember;
         renderHistoryYears(eventYear, resetHistory);
@@ -632,8 +650,7 @@
         $("seconds").textContent = pad(seconds);
 
         const targetDate = new Date(event.target);
-        const formattedTarget = targetDate.getUTCFullYear() + "-" +
-          pad(targetDate.getUTCMonth() + 1) + "-" + pad(targetDate.getUTCDate()) + " 00:00:00 UTC";
+        const formattedTarget = formatLocalTimestamp(targetDate);
         $("timestamp").dateTime = targetDate.toISOString();
         $("timestamp").textContent = formattedTarget;
         $("countdown").setAttribute("aria-label", t().countdownAria(t()[event.phaseKey], event.year, formattedTarget));
