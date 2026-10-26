@@ -814,7 +814,7 @@
           try {
             const parsed = JSON.parse(window.localStorage.getItem(key));
             if (Array.isArray(parsed) && parsed.length === 30 && parsed.every((state) => validStates.has(state))) {
-              calendars[String(year)] = parsed;
+              calendars[String(year)] = clearFutureMarks(year, parsed).statuses;
             }
           } catch {
             // Ignore malformed entries rather than making the entire backup unusable.
