@@ -257,8 +257,7 @@
         <section class="calendar-panel" aria-labelledby="current-calendar-title">
           <div class="calendar-heading">
             <div>
-              <p class="calendar-kicker" data-i18n="currentKicker">Current / upcoming challenge</p>
-              <h3 id="current-calendar-title">November</h3>
+              <h3 id="current-calendar-title">November this year</h3>
             </div>
           </div>
           <div class="weekdays" id="current-weekdays" aria-hidden="true"></div>
@@ -322,7 +321,8 @@
           days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
           calendarTitle: "November log",
           calendarDescription: "Select a date to set its status. You can pre-fill November or record a past year.",
-          currentKicker: "Current / upcoming challenge",
+          thisYearNovember: "November this year",
+          nextYearNovember: "November next year",
           pastKicker: "Past challenge",
           chooseYear: "Choose a past November year",
           weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -345,7 +345,8 @@
           days: "Дней", hours: "Часов", minutes: "Минут", seconds: "Секунд",
           calendarTitle: "Календарь ноября",
           calendarDescription: "Нажми на дату, чтобы выбрать статус. Можно заполнить ноябрь заранее или внести прошлый год.",
-          currentKicker: "Текущий / следующий челлендж",
+          thisYearNovember: "Ноябрь этого года",
+          nextYearNovember: "Ноябрь следующего года",
           pastKicker: "Прошлый челлендж",
           chooseYear: "Выбрать прошлый ноябрь",
           weekdays: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
@@ -557,7 +558,10 @@
       }
 
       function renderCalendars(eventYear, resetHistory = false) {
-        $("current-calendar-title").textContent = (language === "ru" ? "Ноябрь " : "November ") + eventYear;
+        const currentUtcYear = new Date().getUTCFullYear();
+        $("current-calendar-title").textContent = eventYear === currentUtcYear
+          ? t().thisYearNovember
+          : t().nextYearNovember;
         renderHistoryYears(eventYear, resetHistory);
         const historyYear = Number($("history-year").value);
         $("history-calendar-title").textContent = (language === "ru" ? "Ноябрь " : "November ") + historyYear;
