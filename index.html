@@ -4,31 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101010">
-  <meta name="description" content="Countdown to No Nut November.">
+  <meta name="description" content="A simple No Nut November countdown and private, local day-by-day log.">
   <title>NNN — Countdown</title>
   <style>
     :root {
       color-scheme: dark;
       --bg: #101010;
+      --surface: #151515;
+      --line: #303030;
       --text: #f2f2f2;
       --muted: #858585;
       --accent: #e64b57;
+      --success: #72c58b;
+      --success-bg: #142319;
+      --failure: #ff7b86;
+      --failure-bg: #2a1719;
     }
     * { box-sizing: border-box; }
     body {
       min-height: 100vh;
       margin: 0;
-      padding: 32px 20px;
-      display: grid;
-      place-items: center;
+      padding: 32px 20px 56px;
+      display: flex;
+      justify-content: center;
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    main {
-      width: min(760px, 100%);
-      text-align: center;
-    }
+    main { width: min(960px, 100%); text-align: center; }
     .year {
       margin: 0 0 14px;
       color: var(--accent);
@@ -76,34 +79,228 @@
       color: var(--muted);
       font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
+    .calendars {
+      margin-top: 54px;
+      padding-top: 30px;
+      border-top: 1px solid var(--line);
+      text-align: left;
+    }
+    .section-title {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 4vw, 28px);
+      letter-spacing: -.035em;
+    }
+    .section-description {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .calendar-layout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .calendar-panel {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .calendar-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      min-height: 44px;
+      margin-bottom: 18px;
+    }
+    .calendar-heading h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: -.02em;
+    }
+    .calendar-kicker {
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    select {
+      max-width: 130px;
+      padding: 7px 8px;
+      border: 1px solid #454545;
+      border-radius: 3px;
+      background: #101010;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+    }
+    select:focus-visible, button:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 3px;
+    }
+    .weekdays, .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .weekdays {
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      text-align: center;
+    }
+    .weekday { padding: 4px 0; }
+    .calendar-empty { min-width: 0; }
+    .day {
+      display: flex;
+      min-width: 0;
+      min-height: 62px;
+      padding: 7px;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      border: 1px solid #343434;
+      border-radius: 3px;
+      background: #1b1b1b;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      transition: background-color .12s, border-color .12s;
+    }
+    .day:hover { border-color: #777; }
+    .day-number { font-size: 12px; font-variant-numeric: tabular-nums; }
+    .day-status { align-self: flex-end; color: var(--muted); font-size: 15px; line-height: 1; }
+    .day.success { border-color: #396347; background: var(--success-bg); }
+    .day.success .day-status { color: var(--success); }
+    .day.failed { border-color: #704047; background: var(--failure-bg); }
+    .day.failed .day-status { color: var(--failure); }
+    .summary {
+      min-height: 20px;
+      margin: 14px 0 0;
+      color: #bdbdbd;
+      font-size: 11px;
+      line-height: 1.6;
+      font-variant-numeric: tabular-nums;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-mark { display: inline-grid; width: 18px; height: 18px; place-items: center; border: 1px solid var(--line); border-radius: 2px; }
+    .legend-mark.success { color: var(--success); border-color: #396347; }
+    .legend-mark.failed { color: var(--failure); border-color: #704047; }
+    .storage-note {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+    @media (max-width: 720px) {
+      .calendar-layout { grid-template-columns: minmax(0, 1fr); }
+      .calendar-panel { padding: 16px; }
+    }
     @media (max-width: 420px) {
-      body { padding-inline: 12px; }
+      body { padding: 28px 12px 44px; }
       .countdown { gap: 8px; }
       .label { font-size: 10px; }
       .timestamp { font-size: 11px; }
+      .calendar-panel { padding: 12px 8px; }
+      .weekdays, .calendar-grid { gap: 4px; }
+      .day { min-height: 49px; padding: 5px; }
+      .day-number { font-size: 11px; }
+      .day-status { font-size: 13px; }
+      .calendar-heading { gap: 6px; }
+      .calendar-heading h3 { font-size: 15px; }
+      select { max-width: 112px; padding: 6px 5px; font-size: 12px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
 <body>
   <main>
-    <p class="year" id="year">NNN</p>
-    <h1>No Nut November</h1>
-    <p class="phase" id="phase">Starts in</p>
-    <div class="countdown" id="countdown" role="timer" aria-live="off" aria-label="Time until No Nut November">
-      <div><span class="number" id="days">000</span><span class="label">Days</span></div>
-      <div><span class="number" id="hours">00</span><span class="label">Hours</span></div>
-      <div><span class="number" id="minutes">00</span><span class="label">Minutes</span></div>
-      <div><span class="number" id="seconds">00</span><span class="label">Seconds</span></div>
-    </div>
-    <p class="timestamp"><time id="timestamp" datetime="2026-11-01T00:00:00.000Z">2026-11-01 00:00:00 UTC</time></p>
+    <header>
+      <p class="year" id="year">NNN</p>
+      <h1>No Nut November</h1>
+      <p class="phase" id="phase">Starts in</p>
+      <div class="countdown" id="countdown" role="timer" aria-live="off" aria-label="Time until No Nut November">
+        <div><span class="number" id="days">000</span><span class="label">Days</span></div>
+        <div><span class="number" id="hours">00</span><span class="label">Hours</span></div>
+        <div><span class="number" id="minutes">00</span><span class="label">Minutes</span></div>
+        <div><span class="number" id="seconds">00</span><span class="label">Seconds</span></div>
+      </div>
+      <p class="timestamp"><time id="timestamp" datetime="2026-11-01T00:00:00.000Z">2026-11-01 00:00:00 UTC</time></p>
+    </header>
+
+    <section class="calendars" aria-labelledby="calendar-section-title">
+      <h2 class="section-title" id="calendar-section-title">November log</h2>
+      <p class="section-description">Click a date to cycle through unmarked, success, and failed. You can fill in days before November starts or record a past year.</p>
+
+      <div class="calendar-layout">
+        <section class="calendar-panel" aria-labelledby="current-calendar-title">
+          <div class="calendar-heading">
+            <div>
+              <p class="calendar-kicker">Current / upcoming challenge</p>
+              <h3 id="current-calendar-title">November</h3>
+            </div>
+          </div>
+          <div class="weekdays" aria-hidden="true">
+            <span class="weekday">Mon</span><span class="weekday">Tue</span><span class="weekday">Wed</span><span class="weekday">Thu</span><span class="weekday">Fri</span><span class="weekday">Sat</span><span class="weekday">Sun</span>
+          </div>
+          <div class="calendar-grid" id="current-calendar-grid" aria-label="Current November calendar"></div>
+          <p class="summary" id="current-summary" aria-live="polite"></p>
+        </section>
+
+        <section class="calendar-panel" aria-labelledby="history-calendar-title">
+          <div class="calendar-heading">
+            <div>
+              <p class="calendar-kicker">Past challenge</p>
+              <h3 id="history-calendar-title">November 2025</h3>
+            </div>
+            <label>
+              <span class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Choose a past year</span>
+              <select id="history-year" aria-label="Choose a past November year"></select>
+            </label>
+          </div>
+          <div class="weekdays" aria-hidden="true">
+            <span class="weekday">Mon</span><span class="weekday">Tue</span><span class="weekday">Wed</span><span class="weekday">Thu</span><span class="weekday">Fri</span><span class="weekday">Sat</span><span class="weekday">Sun</span>
+          </div>
+          <div class="calendar-grid" id="history-calendar-grid" aria-label="Past November calendar"></div>
+          <p class="summary" id="history-summary" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <div class="legend" aria-label="Calendar legend">
+        <span><i class="legend-mark">—</i> Unmarked</span>
+        <span><i class="legend-mark success">✓</i> Success</span>
+        <span><i class="legend-mark failed">×</i> Failed</span>
+      </div>
+      <p class="storage-note" id="storage-note">Marks are saved in this browser only. They are not uploaded to a server.</p>
+    </section>
   </main>
   <script>
     (() => {
       const $ = (id) => document.getElementById(id);
       const pad = (value, width = 2) => String(value).padStart(width, "0");
+      const validStates = new Set(["unmarked", "success", "failed"]);
+      const stateOrder = ["unmarked", "success", "failed"];
+      const stateSymbols = { unmarked: "—", success: "✓", failed: "×" };
+      const stateNames = { unmarked: "unmarked", success: "success", failed: "failed" };
+      const stateCache = new Map();
+      let storageAvailable = true;
+      let renderedEventYear = null;
 
       function getEvent(now) {
         const date = new Date(now);
@@ -111,18 +308,126 @@
         const start = Date.UTC(year, 10, 1, 0, 0, 0);
         const end = Date.UTC(year, 11, 1, 0, 0, 0);
 
-        if (now < start) {
-          return { year, target: start, phase: "Starts in" };
-        }
-        if (now < end) {
-          return { year, target: end, phase: "Ends in" };
-        }
-        return {
-          year: year + 1,
-          target: Date.UTC(year + 1, 10, 1, 0, 0, 0),
-          phase: "Starts in"
-        };
+        if (now < start) return { year, target: start, phase: "Starts in" };
+        if (now < end) return { year, target: end, phase: "Ends in" };
+        return { year: year + 1, target: Date.UTC(year + 1, 10, 1, 0, 0, 0), phase: "Starts in" };
       }
+
+      function readStatuses(year) {
+        if (stateCache.has(year)) return stateCache.get(year);
+        const statuses = Array(30).fill("unmarked");
+        try {
+          const saved = window.localStorage.getItem("nnn-calendar:v1:" + year);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+              for (let index = 0; index < 30; index += 1) {
+                if (validStates.has(parsed[index])) statuses[index] = parsed[index];
+              }
+            }
+          }
+        } catch {
+          storageAvailable = false;
+        }
+        stateCache.set(year, statuses);
+        return statuses;
+      }
+
+      function updateStorageNote() {
+        $("storage-note").textContent = storageAvailable
+          ? "Marks are saved in this browser only (localStorage). They are not uploaded to a server. Clearing browser data may erase them."
+          : "Browser storage is unavailable or blocked. Marks may last only until this page is closed.";
+      }
+
+      function saveStatuses(year) {
+        try {
+          window.localStorage.setItem("nnn-calendar:v1:" + year, JSON.stringify(stateCache.get(year)));
+          storageAvailable = true;
+        } catch {
+          storageAvailable = false;
+        }
+        updateStorageNote();
+      }
+
+      function renderCalendar(year, gridId, summaryId) {
+        const grid = $(gridId);
+        const statuses = readStatuses(year);
+        grid.replaceChildren();
+
+        // Monday-first layout; the actual Gregorian weekday is calculated in UTC.
+        const firstDayOffset = (new Date(Date.UTC(year, 10, 1)).getUTCDay() + 6) % 7;
+        for (let index = 0; index < firstDayOffset; index += 1) {
+          const empty = document.createElement("span");
+          empty.className = "calendar-empty";
+          empty.setAttribute("aria-hidden", "true");
+          grid.appendChild(empty);
+        }
+
+        for (let day = 1; day <= 30; day += 1) {
+          const state = statuses[day - 1];
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "day " + state;
+          button.dataset.day = String(day);
+          button.setAttribute("aria-label", "November " + day + ", " + year + ": " + stateNames[state] + ". Click to change status.");
+          button.title = "November " + day + ", " + year + " — " + stateNames[state] + ". Click to change.";
+
+          const number = document.createElement("span");
+          number.className = "day-number";
+          number.textContent = String(day);
+          const marker = document.createElement("span");
+          marker.className = "day-status";
+          marker.setAttribute("aria-hidden", "true");
+          marker.textContent = stateSymbols[state];
+          button.append(number, marker);
+
+          button.addEventListener("click", () => {
+            const current = stateCache.get(year);
+            const nextIndex = (stateOrder.indexOf(current[day - 1]) + 1) % stateOrder.length;
+            current[day - 1] = stateOrder[nextIndex];
+            saveStatuses(year);
+            renderCalendar(year, gridId, summaryId);
+            const replacement = $(gridId).querySelector('[data-day="' + day + '"]');
+            if (replacement) replacement.focus();
+          });
+
+          grid.appendChild(button);
+        }
+
+        const success = statuses.filter((state) => state === "success").length;
+        const failed = statuses.filter((state) => state === "failed").length;
+        const unmarked = 30 - success - failed;
+        $(summaryId).textContent = success + " success · " + failed + " failed · " + unmarked + " unmarked";
+        updateStorageNote();
+      }
+
+      function renderHistoryYears(eventYear) {
+        const select = $("history-year");
+        select.replaceChildren();
+        for (let year = eventYear - 1; year >= 2000; year -= 1) {
+          const option = document.createElement("option");
+          option.value = String(year);
+          option.textContent = String(year);
+          select.appendChild(option);
+        }
+        select.value = String(Math.max(2000, eventYear - 1));
+      }
+
+      function renderCalendars(eventYear) {
+        $("current-calendar-title").textContent = "November " + eventYear;
+        renderHistoryYears(eventYear);
+        const historyYear = Number($("history-year").value);
+        $("history-calendar-title").textContent = "November " + historyYear;
+        renderCalendar(eventYear, "current-calendar-grid", "current-summary");
+        renderCalendar(historyYear, "history-calendar-grid", "history-summary");
+        renderedEventYear = eventYear;
+      }
+
+      $("history-year").addEventListener("change", () => {
+        const year = Number($("history-year").value);
+        $("history-calendar-title").textContent = "November " + year;
+        renderCalendar(year, "history-calendar-grid", "history-summary");
+      });
 
       function tick() {
         const now = Date.now();
@@ -133,7 +438,7 @@
         const minutes = Math.floor((secondsLeft % 3600) / 60);
         const seconds = secondsLeft % 60;
 
-        $("year").textContent = `NNN · ${event.year}`;
+        $("year").textContent = "NNN · " + event.year;
         $("phase").textContent = event.phase;
         $("days").textContent = pad(days, 3);
         $("hours").textContent = pad(hours);
@@ -141,15 +446,14 @@
         $("seconds").textContent = pad(seconds);
 
         const targetDate = new Date(event.target);
-        const formattedTarget =
-          `${targetDate.getUTCFullYear()}-${pad(targetDate.getUTCMonth() + 1)}-${pad(targetDate.getUTCDate())} 00:00:00 UTC`;
+        const formattedTarget = targetDate.getUTCFullYear() + "-" +
+          pad(targetDate.getUTCMonth() + 1) + "-" + pad(targetDate.getUTCDate()) + " 00:00:00 UTC";
         $("timestamp").dateTime = targetDate.toISOString();
         $("timestamp").textContent = formattedTarget;
-        $("countdown").setAttribute(
-          "aria-label",
-          `${event.phase} No Nut November ${event.year}, target ${formattedTarget}`
-        );
-        document.title = `NNN ${event.year} — ${event.phase}`;
+        $("countdown").setAttribute("aria-label", event.phase + " No Nut November " + event.year + ", target " + formattedTarget);
+        document.title = "NNN " + event.year + " — " + event.phase;
+
+        if (event.year !== renderedEventYear) renderCalendars(event.year);
       }
 
       tick();
