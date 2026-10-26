@@ -32,6 +32,26 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     main { width: min(960px, 100%); text-align: center; }
+    .top-controls { display: flex; justify-content: flex-end; margin: 0 0 18px; }
+    .language-switch {
+      display: inline-flex;
+      gap: 3px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--surface);
+    }
+    .language-button {
+      min-width: 40px;
+      padding: 6px 9px;
+      border: 0;
+      border-radius: 2px;
+      background: transparent;
+      color: var(--muted);
+      font: 600 12px/1.2 system-ui, sans-serif;
+      cursor: pointer;
+    }
+    .language-button[aria-pressed="true"] { background: #303030; color: var(--text); }
     .year {
       margin: 0 0 14px;
       color: var(--accent);
@@ -46,12 +66,7 @@
       letter-spacing: -.055em;
       line-height: 1.05;
     }
-    .phase {
-      margin: 32px 0 -22px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .04em;
-    }
+    .phase { margin: 32px 0 -22px; color: var(--muted); font-size: 12px; letter-spacing: .04em; }
     .countdown {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -85,29 +100,15 @@
       border-top: 1px solid var(--line);
       text-align: left;
     }
-    .section-title {
-      margin: 0 0 8px;
-      font-size: clamp(22px, 4vw, 28px);
-      letter-spacing: -.035em;
-    }
-    .section-description {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
+    .section-title { margin: 0 0 8px; font-size: clamp(22px, 4vw, 28px); letter-spacing: -.035em; }
+    .section-description { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
     .calendar-layout {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 24px;
       margin-top: 24px;
     }
-    .calendar-panel {
-      min-width: 0;
-      padding: 18px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-    }
+    .calendar-panel { min-width: 0; padding: 18px; border: 1px solid var(--line); background: var(--surface); }
     .calendar-heading {
       display: flex;
       justify-content: space-between;
@@ -116,19 +117,8 @@
       min-height: 44px;
       margin-bottom: 18px;
     }
-    .calendar-heading h3 {
-      margin: 0;
-      font-size: 17px;
-      font-weight: 650;
-      letter-spacing: -.02em;
-    }
-    .calendar-kicker {
-      margin: 0 0 5px;
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
+    .calendar-heading h3 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.02em; }
+    .calendar-kicker { margin: 0 0 5px; color: var(--muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
     select {
       max-width: 130px;
       padding: 7px 8px;
@@ -139,21 +129,9 @@
       font: inherit;
       font-size: 13px;
     }
-    select:focus-visible, button:focus-visible {
-      outline: 2px solid var(--text);
-      outline-offset: 3px;
-    }
-    .weekdays, .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 6px;
-    }
-    .weekdays {
-      margin-bottom: 6px;
-      color: var(--muted);
-      font-size: 10px;
-      text-align: center;
-    }
+    select:focus-visible, button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+    .weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+    .weekdays { margin-bottom: 6px; color: var(--muted); font-size: 10px; text-align: center; }
     .weekday { padding: 4px 0; }
     .calendar-empty { min-width: 0; }
     .day {
@@ -180,38 +158,52 @@
     .day.success .day-status { color: var(--success); }
     .day.failed { border-color: #704047; background: var(--failure-bg); }
     .day.failed .day-status { color: var(--failure); }
-    .summary {
-      min-height: 20px;
-      margin: 14px 0 0;
-      color: #bdbdbd;
-      font-size: 11px;
-      line-height: 1.6;
-      font-variant-numeric: tabular-nums;
-    }
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 18px;
-      margin-top: 22px;
-      color: var(--muted);
-      font-size: 11px;
-    }
+    .summary { min-height: 20px; margin: 14px 0 0; color: #bdbdbd; font-size: 11px; line-height: 1.6; font-variant-numeric: tabular-nums; }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 22px; color: var(--muted); font-size: 11px; }
     .legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .legend-mark { display: inline-grid; width: 18px; height: 18px; place-items: center; border: 1px solid var(--line); border-radius: 2px; }
+    .legend-mark { display: inline-grid; width: 18px; height: 18px; place-items: center; border: 1px solid var(--line); border-radius: 2px; font-style: normal; }
     .legend-mark.success { color: var(--success); border-color: #396347; }
     .legend-mark.failed { color: var(--failure); border-color: #704047; }
-    .storage-note {
-      margin: 20px 0 0;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.6;
+    .storage-note { margin: 20px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .day-menu {
+      position: fixed;
+      z-index: 100;
+      width: 196px;
+      padding: 5px;
+      border: 1px solid #454545;
+      border-radius: 5px;
+      background: #1b1b1b;
+      box-shadow: 0 12px 36px #0009;
     }
+    .day-menu[hidden] { display: none; }
+    .menu-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px;
+      border: 0;
+      border-radius: 3px;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .menu-option:hover, .menu-option:focus-visible { background: #303030; }
+    .menu-option[aria-checked="true"] { background: #303030; }
+    .menu-symbol { display: inline-grid; width: 20px; place-items: center; font-weight: 700; }
+    .menu-option[data-state="success"] .menu-symbol { color: var(--success); }
+    .menu-option[data-state="failed"] .menu-symbol { color: var(--failure); }
+    .menu-option[data-state="unmarked"] .menu-symbol { color: var(--muted); }
+    .menu-divider { height: 1px; margin: 4px 5px; background: var(--line); }
     @media (max-width: 720px) {
       .calendar-layout { grid-template-columns: minmax(0, 1fr); }
       .calendar-panel { padding: 16px; }
     }
     @media (max-width: 420px) {
-      body { padding: 28px 12px 44px; }
+      body { padding: 24px 12px 44px; }
       .countdown { gap: 8px; }
       .label { font-size: 10px; }
       .timestamp { font-size: 11px; }
@@ -224,41 +216,44 @@
       .calendar-heading h3 { font-size: 15px; }
       select { max-width: 112px; padding: 6px 5px; font-size: 12px; }
     }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; animation: none !important; }
-    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
   </style>
 </head>
 <body>
   <main>
+    <div class="top-controls">
+      <div class="language-switch" role="group" id="language-switch" aria-label="Language">
+        <button class="language-button" type="button" data-language="en" aria-pressed="true">EN</button>
+        <button class="language-button" type="button" data-language="ru" aria-pressed="false">RU</button>
+      </div>
+    </div>
+
     <header>
       <p class="year" id="year">NNN</p>
-      <h1>No Nut November</h1>
+      <h1 id="main-heading">No Nut November</h1>
       <p class="phase" id="phase">Starts in</p>
       <div class="countdown" id="countdown" role="timer" aria-live="off" aria-label="Time until No Nut November">
-        <div><span class="number" id="days">000</span><span class="label">Days</span></div>
-        <div><span class="number" id="hours">00</span><span class="label">Hours</span></div>
-        <div><span class="number" id="minutes">00</span><span class="label">Minutes</span></div>
-        <div><span class="number" id="seconds">00</span><span class="label">Seconds</span></div>
+        <div><span class="number" id="days">000</span><span class="label" data-i18n="days">Days</span></div>
+        <div><span class="number" id="hours">00</span><span class="label" data-i18n="hours">Hours</span></div>
+        <div><span class="number" id="minutes">00</span><span class="label" data-i18n="minutes">Minutes</span></div>
+        <div><span class="number" id="seconds">00</span><span class="label" data-i18n="seconds">Seconds</span></div>
       </div>
       <p class="timestamp"><time id="timestamp" datetime="2026-11-01T00:00:00.000Z">2026-11-01 00:00:00 UTC</time></p>
     </header>
 
     <section class="calendars" aria-labelledby="calendar-section-title">
-      <h2 class="section-title" id="calendar-section-title">November log</h2>
-      <p class="section-description">Click a date to cycle through unmarked, success, and failed. You can fill in days before November starts or record a past year.</p>
+      <h2 class="section-title" id="calendar-section-title" data-i18n="calendarTitle">November log</h2>
+      <p class="section-description" id="calendar-description" data-i18n="calendarDescription">Select a date to set its status. You can pre-fill November or record a past year.</p>
 
       <div class="calendar-layout">
         <section class="calendar-panel" aria-labelledby="current-calendar-title">
           <div class="calendar-heading">
             <div>
-              <p class="calendar-kicker">Current / upcoming challenge</p>
+              <p class="calendar-kicker" data-i18n="currentKicker">Current / upcoming challenge</p>
               <h3 id="current-calendar-title">November</h3>
             </div>
           </div>
-          <div class="weekdays" aria-hidden="true">
-            <span class="weekday">Mon</span><span class="weekday">Tue</span><span class="weekday">Wed</span><span class="weekday">Thu</span><span class="weekday">Fri</span><span class="weekday">Sat</span><span class="weekday">Sun</span>
-          </div>
+          <div class="weekdays" id="current-weekdays" aria-hidden="true"></div>
           <div class="calendar-grid" id="current-calendar-grid" aria-label="Current November calendar"></div>
           <p class="summary" id="current-summary" aria-live="polite"></p>
         </section>
@@ -266,51 +261,121 @@
         <section class="calendar-panel" aria-labelledby="history-calendar-title">
           <div class="calendar-heading">
             <div>
-              <p class="calendar-kicker">Past challenge</p>
+              <p class="calendar-kicker" data-i18n="pastKicker">Past challenge</p>
               <h3 id="history-calendar-title">November 2025</h3>
             </div>
             <label>
-              <span class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Choose a past year</span>
-              <select id="history-year" aria-label="Choose a past November year"></select>
+              <span id="history-select-label" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Choose a past November year</span>
+              <select id="history-year" aria-labelledby="history-select-label"></select>
             </label>
           </div>
-          <div class="weekdays" aria-hidden="true">
-            <span class="weekday">Mon</span><span class="weekday">Tue</span><span class="weekday">Wed</span><span class="weekday">Thu</span><span class="weekday">Fri</span><span class="weekday">Sat</span><span class="weekday">Sun</span>
-          </div>
+          <div class="weekdays" id="history-weekdays" aria-hidden="true"></div>
           <div class="calendar-grid" id="history-calendar-grid" aria-label="Past November calendar"></div>
           <p class="summary" id="history-summary" aria-live="polite"></p>
         </section>
       </div>
 
-      <div class="legend" aria-label="Calendar legend">
-        <span><i class="legend-mark">—</i> Unmarked</span>
-        <span><i class="legend-mark success">✓</i> Success</span>
-        <span><i class="legend-mark failed">×</i> Failed</span>
+      <div class="legend" id="legend" aria-label="Calendar legend">
+        <span><i class="legend-mark">—</i><span data-i18n="unmarked">Unmarked</span></span>
+        <span><i class="legend-mark success">✓</i><span data-i18n="success">Success</span></span>
+        <span><i class="legend-mark failed">×</i><span data-i18n="failed">Failed</span></span>
       </div>
       <p class="storage-note" id="storage-note">Marks are saved in this browser only. They are not uploaded to a server.</p>
     </section>
   </main>
+
+  <div class="day-menu" id="day-menu" role="menu" aria-label="Set day status" hidden>
+    <button class="menu-option" type="button" role="menuitemradio" data-state="success" aria-checked="false">
+      <span class="menu-symbol" aria-hidden="true">✓</span><span data-i18n="success">Success</span>
+    </button>
+    <button class="menu-option" type="button" role="menuitemradio" data-state="failed" aria-checked="false">
+      <span class="menu-symbol" aria-hidden="true">×</span><span data-i18n="failed">Failed</span>
+    </button>
+    <div class="menu-divider" role="separator"></div>
+    <button class="menu-option" type="button" role="menuitemradio" data-state="unmarked" aria-checked="true">
+      <span class="menu-symbol" aria-hidden="true">—</span><span data-i18n="unmarked">Unmarked</span>
+    </button>
+  </div>
+
   <script>
     (() => {
       const $ = (id) => document.getElementById(id);
       const pad = (value, width = 2) => String(value).padStart(width, "0");
       const validStates = new Set(["unmarked", "success", "failed"]);
-      const stateOrder = ["unmarked", "success", "failed"];
       const stateSymbols = { unmarked: "—", success: "✓", failed: "×" };
-      const stateNames = { unmarked: "unmarked", success: "success", failed: "failed" };
       const stateCache = new Map();
+      const translations = {
+        en: {
+          pageTitle: "Countdown",
+          language: "Language",
+          heading: "No Nut November",
+          phaseStart: "Starts in",
+          phaseEnd: "Ends in",
+          days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
+          calendarTitle: "November log",
+          calendarDescription: "Select a date to set its status. You can pre-fill November or record a past year.",
+          currentKicker: "Current / upcoming challenge",
+          pastKicker: "Past challenge",
+          chooseYear: "Choose a past November year",
+          weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          unmarked: "Unmarked", success: "Success", failed: "Failed",
+          menuLabel: "Set day status",
+          summary: (success, failed, unmarked) => success + " success · " + failed + " failed · " + unmarked + " unmarked",
+          storageOk: "Marks are saved in this browser only (localStorage). They are not uploaded to a server. Clearing browser data may erase them.",
+          storageBlocked: "Browser storage is unavailable or blocked. Marks may last only until this page is closed.",
+          dateLabel: (day, year, state) => "November " + day + ", " + year + ": " + state + ". Choose a status.",
+          dateTitle: (day, year, state) => "November " + day + ", " + year + " — " + state + ".",
+          calendarAria: (year) => "November " + year + " calendar",
+          countdownAria: (phase, year, date) => phase + " No Nut November " + year + ", target " + date
+        },
+        ru: {
+          pageTitle: "Отсчёт",
+          language: "Язык",
+          heading: "No Nut November",
+          phaseStart: "До начала",
+          phaseEnd: "До конца",
+          days: "Дней", hours: "Часов", minutes: "Минут", seconds: "Секунд",
+          calendarTitle: "Календарь ноября",
+          calendarDescription: "Нажми на дату, чтобы выбрать статус. Можно заполнить ноябрь заранее или внести прошлый год.",
+          currentKicker: "Текущий / следующий челлендж",
+          pastKicker: "Прошлый челлендж",
+          chooseYear: "Выбрать прошлый ноябрь",
+          weekdays: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
+          unmarked: "Не отмечено", success: "Успех", failed: "Провал",
+          menuLabel: "Статус дня",
+          summary: (success, failed, unmarked) => "Успехов: " + success + " · Провалов: " + failed + " · Не отмечено: " + unmarked,
+          storageOk: "Отметки хранятся только в этом браузере (localStorage) и не отправляются на сервер. Очистка данных браузера может их удалить.",
+          storageBlocked: "Хранилище браузера недоступно или заблокировано. Отметки могут пропасть после закрытия страницы.",
+          dateLabel: (day, year, state) => day + " ноября " + year + ": " + state + ". Выбери статус.",
+          dateTitle: (day, year, state) => day + " ноября " + year + " — " + state + ".",
+          calendarAria: (year) => "Календарь ноября " + year,
+          countdownAria: (phase, year, date) => phase + " до No Nut November " + year + ", дата: " + date
+        }
+      };
+
+      let language = "en";
       let storageAvailable = true;
       let renderedEventYear = null;
+      let historyOptionsEventYear = null;
+      let activeDay = null;
+      const menu = $("day-menu");
+
+      try {
+        const savedLanguage = window.localStorage.getItem("nnn-language:v1");
+        if (savedLanguage === "en" || savedLanguage === "ru") language = savedLanguage;
+      } catch {
+        storageAvailable = false;
+      }
+
+      const t = () => translations[language];
 
       function getEvent(now) {
-        const date = new Date(now);
-        const year = date.getUTCFullYear();
+        const year = new Date(now).getUTCFullYear();
         const start = Date.UTC(year, 10, 1, 0, 0, 0);
         const end = Date.UTC(year, 11, 1, 0, 0, 0);
-
-        if (now < start) return { year, target: start, phase: "Starts in" };
-        if (now < end) return { year, target: end, phase: "Ends in" };
-        return { year: year + 1, target: Date.UTC(year + 1, 10, 1, 0, 0, 0), phase: "Starts in" };
+        if (now < start) return { year, target: start, phaseKey: "phaseStart" };
+        if (now < end) return { year, target: end, phaseKey: "phaseEnd" };
+        return { year: year + 1, target: Date.UTC(year + 1, 10, 1, 0, 0, 0), phaseKey: "phaseStart" };
       }
 
       function readStatuses(year) {
@@ -334,9 +399,7 @@
       }
 
       function updateStorageNote() {
-        $("storage-note").textContent = storageAvailable
-          ? "Marks are saved in this browser only (localStorage). They are not uploaded to a server. Clearing browser data may erase them."
-          : "Browser storage is unavailable or blocked. Marks may last only until this page is closed.";
+        $("storage-note").textContent = storageAvailable ? t().storageOk : t().storageBlocked;
       }
 
       function saveStatuses(year) {
@@ -349,13 +412,85 @@
         updateStorageNote();
       }
 
+      function setLanguage(nextLanguage) {
+        if (nextLanguage !== "en" && nextLanguage !== "ru") return;
+        language = nextLanguage;
+        document.documentElement.lang = language;
+        document.querySelectorAll("[data-language]").forEach((button) => {
+          const selected = button.dataset.language === language;
+          button.setAttribute("aria-pressed", String(selected));
+        });
+        $("language-switch").setAttribute("aria-label", t().language);
+        $("main-heading").textContent = t().heading;
+        $("calendar-section-title").textContent = t().calendarTitle;
+        $("calendar-description").textContent = t().calendarDescription;
+        $("history-select-label").textContent = t().chooseYear;
+        $("legend").setAttribute("aria-label", t().calendarTitle);
+        $("current-weekdays").innerHTML = "";
+        $("history-weekdays").innerHTML = "";
+        ["current-weekdays", "history-weekdays"].forEach((id) => {
+          t().weekdays.forEach((day) => {
+            const span = document.createElement("span");
+            span.className = "weekday";
+            span.textContent = day;
+            $(id).appendChild(span);
+          });
+        });
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const key = element.dataset.i18n;
+          if (t()[key] && typeof t()[key] === "string") element.textContent = t()[key];
+        });
+        menu.setAttribute("aria-label", t().menuLabel);
+        try {
+          window.localStorage.setItem("nnn-language:v1", language);
+        } catch {
+          storageAvailable = false;
+        }
+        if (renderedEventYear !== null) renderCalendars(renderedEventYear, false);
+        updateStorageNote();
+        tick();
+      }
+
+      function closeDayMenu(restoreFocus = false) {
+        const previous = activeDay;
+        menu.hidden = true;
+        activeDay = null;
+        if (previous) {
+          const cell = $(previous.gridId).querySelector('[data-day="' + previous.day + '"]');
+          if (cell) cell.setAttribute("aria-expanded", "false");
+          if (restoreFocus && cell) cell.focus();
+        }
+      }
+
+      function openDayMenu(event, year, day, gridId, summaryId, cell) {
+        event.preventDefault();
+        const rect = cell.getBoundingClientRect();
+        const x = event.detail === 0 ? rect.left + rect.width / 2 : event.clientX;
+        const y = event.detail === 0 ? rect.bottom : event.clientY;
+        activeDay = { year, day, gridId, summaryId };
+        cell.setAttribute("aria-expanded", "true");
+        menu.querySelectorAll("[data-state]").forEach((option) => {
+          option.setAttribute("aria-checked", String(option.dataset.state === stateCache.get(year)[day - 1]));
+        });
+        menu.hidden = false;
+        const menuRect = menu.getBoundingClientRect();
+        const margin = 8;
+        const left = Math.max(margin, Math.min(x, window.innerWidth - menuRect.width - margin));
+        let top = y;
+        if (top + menuRect.height > window.innerHeight - margin) top = rect.top - menuRect.height;
+        top = Math.max(margin, Math.min(top, window.innerHeight - menuRect.height - margin));
+        menu.style.left = left + "px";
+        menu.style.top = top + "px";
+        const firstOption = menu.querySelector("[data-state='success']");
+        if (firstOption) firstOption.focus();
+      }
+
       function renderCalendar(year, gridId, summaryId) {
         const grid = $(gridId);
         const statuses = readStatuses(year);
         grid.replaceChildren();
-
-        // Monday-first layout; the actual Gregorian weekday is calculated in UTC.
         const firstDayOffset = (new Date(Date.UTC(year, 10, 1)).getUTCDay() + 6) % 7;
+
         for (let index = 0; index < firstDayOffset; index += 1) {
           const empty = document.createElement("span");
           empty.className = "calendar-empty";
@@ -369,8 +504,11 @@
           button.type = "button";
           button.className = "day " + state;
           button.dataset.day = String(day);
-          button.setAttribute("aria-label", "November " + day + ", " + year + ": " + stateNames[state] + ". Click to change status.");
-          button.title = "November " + day + ", " + year + " — " + stateNames[state] + ". Click to change.";
+          button.setAttribute("aria-haspopup", "menu");
+          button.setAttribute("aria-expanded", "false");
+          button.setAttribute("aria-controls", "day-menu");
+          button.setAttribute("aria-label", t().dateLabel(day, year, t()[state].toLowerCase()));
+          button.title = t().dateTitle(day, year, t()[state].toLowerCase());
 
           const number = document.createElement("span");
           number.className = "day-number";
@@ -380,29 +518,23 @@
           marker.setAttribute("aria-hidden", "true");
           marker.textContent = stateSymbols[state];
           button.append(number, marker);
-
-          button.addEventListener("click", () => {
-            const current = stateCache.get(year);
-            const nextIndex = (stateOrder.indexOf(current[day - 1]) + 1) % stateOrder.length;
-            current[day - 1] = stateOrder[nextIndex];
-            saveStatuses(year);
-            renderCalendar(year, gridId, summaryId);
-            const replacement = $(gridId).querySelector('[data-day="' + day + '"]');
-            if (replacement) replacement.focus();
-          });
-
+          button.addEventListener("click", (event) => openDayMenu(event, year, day, gridId, summaryId, button));
           grid.appendChild(button);
         }
 
         const success = statuses.filter((state) => state === "success").length;
         const failed = statuses.filter((state) => state === "failed").length;
         const unmarked = 30 - success - failed;
-        $(summaryId).textContent = success + " success · " + failed + " failed · " + unmarked + " unmarked";
+        $(summaryId).textContent = t().summary(success, failed, unmarked);
+        const ariaLabel = t().calendarAria(year);
+        grid.setAttribute("aria-label", ariaLabel);
         updateStorageNote();
       }
 
-      function renderHistoryYears(eventYear) {
+      function renderHistoryYears(eventYear, reset = false) {
+        if (historyOptionsEventYear === eventYear && !reset) return;
         const select = $("history-year");
+        const previouslySelected = Number(select.value);
         select.replaceChildren();
         for (let year = eventYear - 1; year >= 2000; year -= 1) {
           const option = document.createElement("option");
@@ -410,22 +542,63 @@
           option.textContent = String(year);
           select.appendChild(option);
         }
-        select.value = String(Math.max(2000, eventYear - 1));
+        const validPrevious = previouslySelected >= 2000 && previouslySelected < eventYear;
+        select.value = String(!reset && validPrevious ? previouslySelected : Math.max(2000, eventYear - 1));
+        historyOptionsEventYear = eventYear;
       }
 
-      function renderCalendars(eventYear) {
-        $("current-calendar-title").textContent = "November " + eventYear;
-        renderHistoryYears(eventYear);
+      function renderCalendars(eventYear, resetHistory = false) {
+        $("current-calendar-title").textContent = (language === "ru" ? "Ноябрь " : "November ") + eventYear;
+        renderHistoryYears(eventYear, resetHistory);
         const historyYear = Number($("history-year").value);
-        $("history-calendar-title").textContent = "November " + historyYear;
+        $("history-calendar-title").textContent = (language === "ru" ? "Ноябрь " : "November ") + historyYear;
         renderCalendar(eventYear, "current-calendar-grid", "current-summary");
         renderCalendar(historyYear, "history-calendar-grid", "history-summary");
         renderedEventYear = eventYear;
       }
 
+      function selectDayStatus(state) {
+        if (!activeDay || !validStates.has(state)) return;
+        const selection = { ...activeDay };
+        stateCache.get(selection.year)[selection.day - 1] = state;
+        saveStatuses(selection.year);
+        renderCalendar(selection.year, selection.gridId, selection.summaryId);
+        closeDayMenu(false);
+        const updatedCell = $(selection.gridId).querySelector('[data-day="' + selection.day + '"]');
+        if (updatedCell) updatedCell.focus();
+      }
+
+      document.querySelectorAll("[data-language]").forEach((button) => {
+        button.addEventListener("click", () => setLanguage(button.dataset.language));
+      });
+      menu.querySelectorAll("[data-state]").forEach((option) => {
+        option.addEventListener("click", () => selectDayStatus(option.dataset.state));
+      });
+      menu.addEventListener("keydown", (event) => {
+        const options = Array.from(menu.querySelectorAll("[data-state]"));
+        const focusedIndex = options.indexOf(document.activeElement);
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeDayMenu(true);
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const direction = event.key === "ArrowDown" ? 1 : -1;
+          options[(focusedIndex + direction + options.length) % options.length].focus();
+        } else if (event.key === "Home" || event.key === "End") {
+          event.preventDefault();
+          options[event.key === "Home" ? 0 : options.length - 1].focus();
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!menu.hidden && !menu.contains(event.target) && !event.target.closest(".day")) closeDayMenu(false);
+      });
+      window.addEventListener("resize", () => { if (!menu.hidden) closeDayMenu(false); });
+      window.addEventListener("scroll", () => { if (!menu.hidden) closeDayMenu(false); }, true);
+
       $("history-year").addEventListener("change", () => {
         const year = Number($("history-year").value);
-        $("history-calendar-title").textContent = "November " + year;
+        $("history-calendar-title").textContent = (language === "ru" ? "Ноябрь " : "November ") + year;
         renderCalendar(year, "history-calendar-grid", "history-summary");
       });
 
@@ -439,7 +612,7 @@
         const seconds = secondsLeft % 60;
 
         $("year").textContent = "NNN · " + event.year;
-        $("phase").textContent = event.phase;
+        $("phase").textContent = t()[event.phaseKey];
         $("days").textContent = pad(days, 3);
         $("hours").textContent = pad(hours);
         $("minutes").textContent = pad(minutes);
@@ -450,14 +623,13 @@
           pad(targetDate.getUTCMonth() + 1) + "-" + pad(targetDate.getUTCDate()) + " 00:00:00 UTC";
         $("timestamp").dateTime = targetDate.toISOString();
         $("timestamp").textContent = formattedTarget;
-        $("countdown").setAttribute("aria-label", event.phase + " No Nut November " + event.year + ", target " + formattedTarget);
-        document.title = "NNN " + event.year + " — " + event.phase;
+        $("countdown").setAttribute("aria-label", t().countdownAria(t()[event.phaseKey], event.year, formattedTarget));
+        document.title = "NNN " + event.year + " — " + t().pageTitle;
 
-        if (event.year !== renderedEventYear) renderCalendars(event.year);
+        if (event.year !== renderedEventYear) renderCalendars(event.year, true);
       }
 
-      tick();
-      setInterval(tick, 1000);
+      setLanguage(language);
     })();
   </script>
 </body>
