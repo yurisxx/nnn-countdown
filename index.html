@@ -161,11 +161,30 @@
     .day:hover { border-color: #777; }
     .day-number { font-size: 12px; font-variant-numeric: tabular-nums; }
     .day-status { align-self: flex-end; color: var(--muted); font-size: 15px; line-height: 1; }
+    .day.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
     .day.success { border-color: #396347; background: var(--success-bg); }
+    .day.success.today { border-color: var(--accent); }
     .day.success .day-status { color: var(--success); }
     .day.failed { border-color: #704047; background: var(--failure-bg); }
     .day.failed .day-status { color: var(--failure); }
     .summary { min-height: 20px; margin: 14px 0 0; color: #bdbdbd; font-size: 11px; line-height: 1.6; font-variant-numeric: tabular-nums; }
+    .stats-section { margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--line); }
+    .stats-heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .stats-year { color: var(--accent); font: 600 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 20px; }
+    .stat { min-width: 0; padding-left: 14px; border-left: 2px solid var(--line); }
+    .stat:first-child { border-left-color: var(--accent); }
+    .stat-value { display: block; overflow-wrap: anywhere; font-size: clamp(24px, 4vw, 36px); font-weight: 650; line-height: 1.1; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+    .stat-label { display: block; margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .stat-detail { display: block; min-height: 1.5em; margin-top: 5px; color: #bdbdbd; font-size: 10px; line-height: 1.5; }
+    .stats-note { margin: 16px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .data-tools { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .data-tools .calendar-kicker { margin-bottom: 6px; }
+    .data-tools-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .data-button { padding: 9px 12px; border: 1px solid #553035; border-radius: 3px; background: var(--surface); color: var(--text); font: 600 12px/1.2 system-ui, sans-serif; cursor: pointer; }
+    .data-button:hover { border-color: var(--accent); }
+    .data-button:disabled { opacity: .5; cursor: not-allowed; }
+    .file-input-hidden { display: none; }
     .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 22px; color: var(--muted); font-size: 11px; }
     .legend span { display: inline-flex; align-items: center; gap: 6px; }
     .legend-mark { display: inline-grid; width: 18px; height: 18px; place-items: center; border: 1px solid var(--line); border-radius: 2px; font-style: normal; }
@@ -208,6 +227,8 @@
     @media (max-width: 720px) {
       .calendar-layout { grid-template-columns: minmax(0, 1fr); }
       .calendar-panel { padding: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 22px; }
+      .data-tools { align-items: flex-start; }
     }
     @media (max-width: 420px) {
       body { padding: 24px 12px 44px; }
@@ -222,6 +243,9 @@
       .day-status { font-size: 13px; }
       .calendar-heading { gap: 6px; }
       .calendar-heading h3 { font-size: 15px; }
+      .stat { padding-left: 10px; }
+      .data-tools-actions { width: 100%; }
+      .data-button { flex: 1; }
       select { max-width: 112px; padding: 6px 5px; font-size: 12px; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
@@ -282,10 +306,48 @@
         </section>
       </div>
 
+      <section class="stats-section" aria-labelledby="stats-title">
+        <div class="stats-heading-row">
+          <h3 class="section-title" id="stats-title" data-i18n="statsTitle">Challenge statistics</h3>
+          <span class="stats-year" id="stats-year">NNN · 2026</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat">
+            <span class="stat-value" id="stats-successes">0</span>
+            <span class="stat-label" data-i18n="statSuccesses">Successful days</span>
+            <span class="stat-detail" id="stats-marked-detail">of 0 marked days</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="stats-current-streak">0 days</span>
+            <span class="stat-label" data-i18n="statCurrentStreak">Current streak</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="stats-longest-streak">0 days</span>
+            <span class="stat-label" data-i18n="statLongestStreak">Longest streak</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="stats-success-rate">—</span>
+            <span class="stat-label" data-i18n="statSuccessRate">Success rate</span>
+          </div>
+        </div>
+        <p class="stats-note" id="stats-note" data-i18n="statsNote">Only dates that have passed are counted. Unmarked and future dates are excluded from the success rate; an unmarked or failed day breaks a streak.</p>
+      </section>
+
       <div class="legend" id="legend" aria-label="Calendar legend">
         <span><i class="legend-mark">—</i><span data-i18n="unmarked">Unmarked</span></span>
         <span><i class="legend-mark success">✓</i><span data-i18n="success">Success</span></span>
         <span><i class="legend-mark failed">×</i><span data-i18n="failed">Failed</span></span>
+      </div>
+      <div class="data-tools">
+        <div>
+          <p class="calendar-kicker" data-i18n="backupTitle">Data backup</p>
+          <p class="section-description" id="backup-description" data-i18n="backupDescription">Export saved calendars to a JSON file or restore them later.</p>
+        </div>
+        <div class="data-tools-actions">
+          <button class="data-button" type="button" id="export-backup" data-i18n="exportJson">Export JSON</button>
+          <button class="data-button" type="button" id="import-backup-button" data-i18n="importJson">Import JSON</button>
+          <input class="file-input-hidden" type="file" id="import-backup-file" accept=".json,application/json">
+        </div>
       </div>
       <p class="storage-note" id="storage-note">Marks are saved in this browser only. They are not uploaded to a server.</p>
     </section>
@@ -320,7 +382,7 @@
           phaseEnd: "Ends in",
           days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
           calendarTitle: "November log",
-          calendarDescription: "Select a date to set its status. You can pre-fill November or record a past year.",
+          calendarDescription: "Select a date to set its status.",
           thisYearNovember: "November this year",
           nextYearNovember: "November next year",
           pastKicker: "Past NNN",
@@ -334,6 +396,25 @@
           dateLabel: (day, year, state) => "November " + day + ", " + year + ": " + state + ". Choose a status.",
           dateTitle: (day, year, state) => "November " + day + ", " + year + " — " + state + ".",
           calendarAria: (year) => "November " + year + " calendar",
+          statsTitle: "Challenge statistics",
+          statSuccesses: "Successful days",
+          statCurrentStreak: "Current streak",
+          statLongestStreak: "Longest streak",
+          statSuccessRate: "Success rate",
+          markedDays: (count) => "of " + count + " marked " + (count === 1 ? "day" : "days"),
+          dayCount: (count) => count + " " + (count === 1 ? "day" : "days"),
+          statsNote: "Only dates up to today are counted. Unmarked and future dates are excluded from the success rate; an unmarked or failed day breaks a streak.",
+          backupTitle: "Data backup",
+          backupDescription: "Export saved calendars to a JSON file or restore them later.",
+          exportJson: "Export JSON",
+          importJson: "Import JSON",
+          exportNoData: "No saved calendars to export yet. Mark a day first.",
+          exportSuccess: "Calendar backup downloaded.",
+          exportFailed: "Could not read saved calendars. Browser storage may be blocked.",
+          importConfirm: (years) => "Import marks for " + years + "? Existing marks for these years will be replaced. Other years will stay unchanged.",
+          importSuccess: (count) => "Imported " + count + (count === 1 ? " year." : " years."),
+          importInvalid: "This file is not a valid NNN Countdown backup.",
+          importFailed: "Import failed. Browser storage may be unavailable; existing data was kept where possible.",
           countdownAria: (phase, year, date) => phase + " No Nut November " + year + ", target " + date
         },
         ru: {
@@ -358,6 +439,25 @@
           dateLabel: (day, year, state) => day + " ноября " + year + ": " + state + ". Выбери статус.",
           dateTitle: (day, year, state) => day + " ноября " + year + " — " + state + ".",
           calendarAria: (year) => "Календарь ноября " + year,
+          statsTitle: "Статистика испытания",
+          statSuccesses: "Успешные дни",
+          statCurrentStreak: "Текущая серия",
+          statLongestStreak: "Самая длинная серия",
+          statSuccessRate: "Процент успеха",
+          markedDays: (count) => "из " + count + " отмеченн" + (count === 1 ? "ого дня" : count >= 2 && count <= 4 ? "ых дня" : "ых дней"),
+          dayCount: (count) => count + " " + (count % 10 === 1 && count % 100 !== 11 ? "день" : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14) ? "дня" : "дней"),
+          statsNote: "Учитываются только даты, которые уже прошли. Будущие и неотмеченные дни не входят в процент успеха; неотмеченный или провальный день прерывает серию.",
+          backupTitle: "Резервная копия",
+          backupDescription: "Сохрани календарь в JSON или восстанови отметки из файла.",
+          exportJson: "Экспорт JSON",
+          importJson: "Импорт JSON",
+          exportNoData: "Пока нечего экспортировать. Сначала отметь хотя бы один день.",
+          exportSuccess: "Резервная копия календаря скачана.",
+          exportFailed: "Не удалось прочитать сохранённые календари. Возможно, хранилище браузера заблокировано.",
+          importConfirm: (years) => "Импортировать отметки за " + years + "? Данные этих лет будут заменены; остальные годы не изменятся.",
+          importSuccess: (count) => "Импортировано годов: " + count + ".",
+          importInvalid: "Этот файл не является корректной резервной копией NNN Countdown.",
+          importFailed: "Не удалось импортировать данные. Возможно, хранилище браузера недоступно; имеющиеся данные по возможности сохранены.",
           countdownAria: (phase, year, date) => phase + " до No Nut November " + year + ", дата: " + date
         }
       };
@@ -513,6 +613,38 @@
         if (firstOption) firstOption.focus();
       }
 
+      function renderStats(now = new Date()) {
+        const year = now.getFullYear();
+        const elapsedDays = now.getMonth() < 10 ? 0 : now.getMonth() > 10 ? 30 : now.getDate();
+        const pastStatuses = readStatuses(year).slice(0, elapsedDays);
+        const successes = pastStatuses.filter((state) => state === "success").length;
+        const failures = pastStatuses.filter((state) => state === "failed").length;
+        const marked = successes + failures;
+
+        let longestStreak = 0;
+        let runningStreak = 0;
+        for (const state of pastStatuses) {
+          if (state === "success") {
+            runningStreak += 1;
+            longestStreak = Math.max(longestStreak, runningStreak);
+          } else {
+            runningStreak = 0;
+          }
+        }
+
+        let currentStreak = 0;
+        for (let index = pastStatuses.length - 1; index >= 0 && pastStatuses[index] === "success"; index -= 1) {
+          currentStreak += 1;
+        }
+
+        $("stats-year").textContent = "NNN · " + year;
+        $("stats-successes").textContent = String(successes);
+        $("stats-marked-detail").textContent = t().markedDays(marked);
+        $("stats-current-streak").textContent = t().dayCount(currentStreak);
+        $("stats-longest-streak").textContent = t().dayCount(longestStreak);
+        $("stats-success-rate").textContent = marked ? Math.round((successes / marked) * 100) + "%" : "—";
+      }
+
       function renderCalendar(year, gridId, summaryId) {
         const grid = $(gridId);
         const statuses = readStatuses(year);
@@ -531,6 +663,11 @@
           const button = document.createElement("button");
           button.type = "button";
           button.className = "day " + state;
+          const today = new Date();
+          if (year === today.getFullYear() && today.getMonth() === 10 && day === today.getDate()) {
+            button.classList.add("today");
+            button.setAttribute("aria-current", "date");
+          }
           button.dataset.day = String(day);
           button.setAttribute("aria-haspopup", "menu");
           button.setAttribute("aria-expanded", "false");
@@ -594,10 +731,124 @@
         stateCache.get(selection.year)[selection.day - 1] = state;
         saveStatuses(selection.year);
         renderCalendar(selection.year, selection.gridId, selection.summaryId);
+        renderStats(new Date());
         closeDayMenu(false);
         const updatedCell = $(selection.gridId).querySelector('[data-day="' + selection.day + '"]');
         if (updatedCell) updatedCell.focus();
       }
+
+      function getStoredCalendars() {
+        const calendars = {};
+        const yearPattern = /^nnn-calendar:v1:(\d{4})$/;
+        for (let index = 0; index < window.localStorage.length; index += 1) {
+          const key = window.localStorage.key(index);
+          const match = key && key.match(yearPattern);
+          if (!match) continue;
+          const year = Number(match[1]);
+          if (year < 2000 || year > 9999) continue;
+          try {
+            const parsed = JSON.parse(window.localStorage.getItem(key));
+            if (Array.isArray(parsed) && parsed.length === 30 && parsed.every((state) => validStates.has(state))) {
+              calendars[String(year)] = parsed;
+            }
+          } catch {
+            // Ignore malformed entries rather than making the entire backup unusable.
+          }
+        }
+        return calendars;
+      }
+
+      function exportBackup() {
+        try {
+          const calendars = getStoredCalendars();
+          const years = Object.keys(calendars).sort();
+          if (years.length === 0) {
+            window.alert(t().exportNoData);
+            return;
+          }
+          const backup = {
+            format: "nnn-countdown-backup",
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            years: calendars
+          };
+          const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "nnn-countdown-backup-" + new Date().getFullYear() + ".json";
+          link.click();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          window.alert(t().exportSuccess);
+        } catch {
+          window.alert(t().exportFailed);
+        }
+      }
+
+      async function importBackup(file) {
+        if (!file) return;
+        try {
+          const backup = JSON.parse(await file.text());
+          if (!backup || backup.format !== "nnn-countdown-backup" || backup.version !== 1 ||
+              !backup.years || typeof backup.years !== "object" || Array.isArray(backup.years)) {
+            throw new Error("Invalid backup format");
+          }
+
+          const incoming = {};
+          for (const [yearText, statuses] of Object.entries(backup.years)) {
+            if (!/^\d{4}$/.test(yearText)) throw new Error("Invalid year");
+            const year = Number(yearText);
+            if (year < 2000 || year > 9999 || !Array.isArray(statuses) || statuses.length !== 30 ||
+                !statuses.every((state) => validStates.has(state))) {
+              throw new Error("Invalid calendar data");
+            }
+            incoming[yearText] = statuses.slice();
+          }
+          const years = Object.keys(incoming).sort();
+          if (years.length === 0) throw new Error("No calendars found");
+          if (!window.confirm(t().importConfirm(years.join(", ")))) return;
+
+          const previousValues = new Map();
+          for (const year of years) {
+            previousValues.set("nnn-calendar:v1:" + year, window.localStorage.getItem("nnn-calendar:v1:" + year));
+          }
+
+          try {
+            for (const year of years) {
+              window.localStorage.setItem("nnn-calendar:v1:" + year, JSON.stringify(incoming[year]));
+            }
+          } catch (error) {
+            for (const [key, previous] of previousValues) {
+              try {
+                if (previous === null) window.localStorage.removeItem(key);
+                else window.localStorage.setItem(key, previous);
+              } catch {
+                // Best-effort rollback if browser storage itself is failing.
+              }
+            }
+            throw error;
+          }
+
+          for (const year of years) stateCache.set(Number(year), incoming[year]);
+          if (renderedEventYear !== null) renderCalendars(renderedEventYear, false);
+          renderStats(new Date());
+          window.alert(t().importSuccess(years.length));
+        } catch (error) {
+          if (error instanceof SyntaxError || (error && ["Invalid backup format", "Invalid year", "Invalid calendar data", "No calendars found"].includes(error.message))) {
+            window.alert(t().importInvalid);
+          } else {
+            window.alert(t().importFailed);
+          }
+        }
+      }
+
+      $("export-backup").addEventListener("click", exportBackup);
+      $("import-backup-button").addEventListener("click", () => $("import-backup-file").click());
+      $("import-backup-file").addEventListener("change", async (event) => {
+        const file = event.target.files && event.target.files[0];
+        event.target.value = "";
+        await importBackup(file);
+      });
 
       document.querySelectorAll("[data-language]").forEach((button) => {
         button.addEventListener("click", () => setLanguage(button.dataset.language));
@@ -657,6 +908,7 @@
         document.title = "NNN " + event.year + " — " + t().pageTitle;
 
         if (event.year !== renderedEventYear) renderCalendars(event.year, true);
+        renderStats(new Date(now));
       }
 
       setLanguage(language);
