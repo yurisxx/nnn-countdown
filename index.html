@@ -402,7 +402,7 @@
           statSuccessRate: "Success rate",
           markedDays: (count) => "of " + count + " marked " + (count === 1 ? "day" : "days"),
           dayCount: (count) => count + " " + (count === 1 ? "day" : "days"),
-          statsNote: "Only dates up to today are counted. Unmarked and future dates are excluded from the success rate; an unmarked or failed day breaks a streak.",
+          statsNote: "Only dates up to today are counted. Unmarked and future dates are excluded from the success rate. Unmarked days do not break a streak; a marked failed day does.",
           backupTitle: "Data backup",
           backupDescription: "Export saved calendars to a JSON file or restore them later.",
           exportJson: "Export JSON",
@@ -445,7 +445,7 @@
           statSuccessRate: "Процент успеха",
           markedDays: (count) => "из " + count + " отмеченн" + (count === 1 ? "ого дня" : count >= 2 && count <= 4 ? "ых дня" : "ых дней"),
           dayCount: (count) => count + " " + (count % 10 === 1 && count % 100 !== 11 ? "день" : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14) ? "дня" : "дней"),
-          statsNote: "Учитываются только даты, которые уже прошли. Будущие и неотмеченные дни не входят в процент успеха; неотмеченный или провальный день прерывает серию.",
+          statsNote: "Учитываются только прошедшие даты. Будущие и пропущенные дни не входят в процент успеха. Пропущенный день не прерывает серию — её можно отметить позже; прерывает только отмеченный провал.",
           backupTitle: "Резервная копия",
           backupDescription: "Сохрани календарь в JSON или восстанови отметки из файла.",
           exportJson: "Экспорт JSON",
@@ -626,14 +626,16 @@
           if (state === "success") {
             runningStreak += 1;
             longestStreak = Math.max(longestStreak, runningStreak);
-          } else {
+          } else if (state === "failed") {
             runningStreak = 0;
           }
         }
 
         let currentStreak = 0;
-        for (let index = pastStatuses.length - 1; index >= 0 && pastStatuses[index] === "success"; index -= 1) {
-          currentStreak += 1;
+        for (let index = pastStatuses.length - 1; index >= 0; index -= 1) {
+          const state = pastStatuses[index];
+          if (state === "failed") break;
+          if (state === "success") currentStreak += 1;
         }
 
         $("stats-successes").textContent = String(successes);
