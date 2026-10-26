@@ -6,14 +6,15 @@ A lightweight, responsive No Nut November countdown and day-by-day calendar. Bui
 
 ## Features
 
-- **Automatic yearly countdown.** Before November, counts down to November 1 at 00:00 UTC. During November, counts down to December 1 at 00:00 UTC. In December, it advances to the next year's challenge.
-- **Visitor-local time zones.** NNN starts at midnight on November 1 and ends at midnight on December 1 in each visitor's own time zone. The countdown and timestamp adapt to UTC, UTC+3, half-hour offsets, and daylight-saving time.
+- **Automatic yearly countdown.** Before November, counts down to November 1. During November, counts down to December 1. From December onward, it advances to the next year's challenge.
+- **Visitor-local time zones.** NNN starts at local midnight on November 1 and ends at local midnight on December 1 in the visitor's own time zone. The displayed target offset accounts for daylight-saving changes.
 - **English and Russian interface.** Use the EN / RU switch in the top-right corner. The choice is remembered in the current browser.
 - **Current and historical calendars.** The current/upcoming November appears alongside a past November. Choose a previous year from the selector (2000 through the most recently completed challenge year).
-- **Context menu for each day.** Click a calendar date to open a menu beside it, then choose **Success**, **Failed**, or **Unmarked**. Click outside the menu or press Escape to dismiss it. Keyboard users can navigate the menu with the arrow keys, Home, and End.
-- **Past-day statistics.** Shows successful marked days, the current and longest success streak, and success rate. Future and unmarked days are excluded from the success-rate denominator; unmarked and failed days break a streak.
-- **Today's marker.** A restrained red outline identifies today's date in the current November calendar.
-- **JSON backup and restore.** Export all saved years into one JSON file and import a backup later. Import validates the file and asks before replacing data for the included years; other years remain unchanged.
+- **Context menu for each day.** Past dates and today can be marked **Success**, **Failed**, or **Unmarked**. Future dates are disabled. Click outside the menu or press Escape to dismiss it. Keyboard users can navigate the menu with the arrow keys, Home, and End.
+- **Past-day statistics.** Shows successful marked days, the current and longest success streak, and success rate. Future and unmarked days are excluded from the success-rate denominator. Unmarked days do not break a streak; a marked failed day does. Streaks can be updated later by marking missed dates.
+- **Today's marker.** A restrained red outline identifies today's date in the current November calendar and refreshes after local midnight.
+- **JSON backup and restore.** Export all saved years into one JSON file and import a backup later. Import validates the file and asks before replacing data for the included years; other years remain unchanged. Future-date marks are cleared on import/export.
+- **Cross-tab updates.** Changes made in another tab of the same browser profile refresh the calendar.
 - **Per-year summaries.** Each calendar counts success, failed, and unmarked days.
 - **Responsive layout.** Calendars stack on narrow screens and the day menu stays within the visible viewport.
 - **Local-only data.** No account or server is needed, and calendar entries are never uploaded.
@@ -57,9 +58,11 @@ This is a static site: there is no build command or output directory.
 
 - Challenge start: November 1 at 00:00:00 in the visitor's local time zone.
 - Challenge end: December 1 at 00:00:00 in the visitor's local time zone.
-- The countdown chooses the appropriate year from the current local calendar date automatically.
-- The displayed timestamp includes the target date's UTC offset (for example, `UTC+03:00`). The offset is calculated for that date, so daylight-saving changes are accounted for.
-- The calendar's chosen statuses are user-entered notes, not an automatic judgement.
+- Before November, the countdown targets that year's start; during November it targets that year's end; from December onward it targets the next year's start.
+- The displayed timestamp includes the target date's UTC offset (for example, `UTC+03:00`). The offset is calculated for the target date, so daylight-saving changes are accounted for.
+- Only dates up to and including today can be marked. Future dates are disabled and are cleared from imported or exported backups.
+- Statistics count only completed days (up to yesterday). The success rate uses marked completed days only. Unmarked days are ignored when calculating streaks; a failed day resets the streak.
+- Calendar statuses are user-entered notes, not an automatic judgement. The app does not verify behavior or prevent someone from editing past statuses; this is a personal tracker, not an enforcement system.
 
 ## License
 
