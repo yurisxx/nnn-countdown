@@ -309,7 +309,6 @@
       <section class="stats-section" aria-labelledby="stats-title">
         <div class="stats-heading-row">
           <h3 class="section-title" id="stats-title" data-i18n="statsTitle">Challenge statistics</h3>
-          <span class="stats-year" id="stats-year">NNN · 2026</span>
         </div>
         <div class="stats-grid">
           <div class="stat">
@@ -637,7 +636,6 @@
           currentStreak += 1;
         }
 
-        $("stats-year").textContent = "NNN · " + year;
         $("stats-successes").textContent = String(successes);
         $("stats-marked-detail").textContent = t().markedDays(marked);
         $("stats-current-streak").textContent = t().dayCount(currentStreak);
