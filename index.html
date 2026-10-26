@@ -414,6 +414,7 @@
 
       function setLanguage(nextLanguage) {
         if (nextLanguage !== "en" && nextLanguage !== "ru") return;
+        closeDayMenu(false);
         language = nextLanguage;
         document.documentElement.lang = language;
         document.querySelectorAll("[data-language]").forEach((button) => {
@@ -630,6 +631,7 @@
       }
 
       setLanguage(language);
+      setInterval(tick, 1000);
     })();
   </script>
 </body>
