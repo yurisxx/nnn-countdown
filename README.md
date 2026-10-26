@@ -7,7 +7,7 @@ A lightweight, responsive No Nut November countdown and day-by-day calendar. Bui
 ## Features
 
 - **Automatic yearly countdown.** Before November, counts down to November 1 at 00:00 UTC. During November, counts down to December 1 at 00:00 UTC. In December, it advances to the next year's challenge.
-- **Fixed UTC boundaries.** Every visitor sees the same start and end instant, regardless of local time zone.
+- **Visitor-local time zones.** NNN starts at midnight on November 1 and ends at midnight on December 1 in each visitor's own time zone. The countdown and timestamp adapt to UTC, UTC+3, half-hour offsets, and daylight-saving time.
 - **English and Russian interface.** Use the EN / RU switch in the top-right corner. The choice is remembered in the current browser.
 - **Current and historical calendars.** The current/upcoming November appears alongside a past November. Choose a previous year from the selector (2000 through the most recently completed challenge year).
 - **Context menu for each day.** Click a calendar date to open a menu beside it, then choose **Success**, **Failed**, or **Unmarked**. Click outside the menu or press Escape to dismiss it. Keyboard users can navigate the menu with the arrow keys, Home, and End.
@@ -53,9 +53,10 @@ This is a static site: there is no build command or output directory.
 
 ## Date logic
 
-- Challenge start: November 1 at 00:00:00 UTC.
-- Challenge end: December 1 at 00:00:00 UTC.
-- The countdown chooses the appropriate year from the current UTC date automatically.
+- Challenge start: November 1 at 00:00:00 in the visitor's local time zone.
+- Challenge end: December 1 at 00:00:00 in the visitor's local time zone.
+- The countdown chooses the appropriate year from the current local calendar date automatically.
+- The displayed timestamp includes the target date's UTC offset (for example, `UTC+03:00`). The offset is calculated for that date, so daylight-saving changes are accounted for.
 - The calendar's chosen statuses are user-entered notes, not an automatic judgement.
 
 ## License
