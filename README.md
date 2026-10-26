@@ -11,7 +11,9 @@ A lightweight, responsive No Nut November countdown and day-by-day calendar. Bui
 - **English and Russian interface.** Use the EN / RU switch in the top-right corner. The choice is remembered in the current browser.
 - **Current and historical calendars.** The current/upcoming November appears alongside a past November. Choose a previous year from the selector (2000 through the most recently completed challenge year).
 - **Context menu for each day.** Click a calendar date to open a menu beside it, then choose **Success**, **Failed**, or **Unmarked**. Click outside the menu or press Escape to dismiss it. Keyboard users can navigate the menu with the arrow keys, Home, and End.
-- **Editable ahead of time.** You can mark days before November starts or fill in past years manually; the site never assigns a result automatically.
+- **Past-day statistics.** Shows successful marked days, the current and longest success streak, and success rate. Future and unmarked days are excluded from the success-rate denominator; unmarked and failed days break a streak.
+- **Today's marker.** A restrained red outline identifies today's date in the current November calendar.
+- **JSON backup and restore.** Export all saved years into one JSON file and import a backup later. Import validates the file and asks before replacing data for the included years; other years remain unchanged.
 - **Per-year summaries.** Each calendar counts success, failed, and unmarked days.
 - **Responsive layout.** Calendars stack on narrow screens and the day menu stays within the visible viewport.
 - **Local-only data.** No account or server is needed, and calendar entries are never uploaded.
