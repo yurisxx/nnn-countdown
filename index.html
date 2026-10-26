@@ -88,6 +88,13 @@
       color: var(--muted);
       font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
+    .countdown-note {
+      max-width: 680px;
+      margin: 18px auto 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
     .calendars {
       margin-top: 54px;
       padding-top: 30px;
@@ -267,6 +274,7 @@
         <div><span class="number" id="seconds">00</span><span class="label" data-i18n="seconds">Seconds</span></div>
       </div>
       <p class="timestamp"><time id="timestamp" datetime="2026-11-01T00:00:00.000Z">2026-11-01 00:00:00 UTC</time></p>
+      <p class="countdown-note" data-i18n="countdownNote">Legend has it that those who survive No Nut November achieve enlightenment. Then December rolls around, and the enlightened suddenly remember what they were putting up with all along.</p>
     </header>
 
     <section class="calendars" aria-labelledby="calendar-section-title">
@@ -374,6 +382,7 @@
           language: "Language",
           challengeName: "NNN",
           heading: "No Nut November",
+          countdownNote: "Legend has it that those who survive No Nut November achieve enlightenment. Then December rolls around, and the enlightened suddenly remember what they were putting up with all along.",
           phaseStart: "Starts in",
           phaseEnd: "Ends in",
           days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
@@ -424,6 +433,7 @@
           language: "Язык",
           challengeName: "Недрочабрь",
           heading: "Недрочабрь",
+          countdownNote: "По легенде, прошедшие Недрочабрь достигают просветления. А потом наступает декабрь, и просветлённые внезапно вспоминают, ради чего терпели.",
           phaseStart: "До начала",
           phaseEnd: "До конца",
           days: "Дней", hours: "Часов", minutes: "Минут", seconds: "Секунд",
