@@ -1,55 +1,63 @@
 # NNN Countdown
 
-A small, responsive No Nut November countdown and day-by-day calendar. It uses plain HTML, CSS, and JavaScript—no frameworks, build tools, external fonts, analytics, or third-party scripts.
+A lightweight, responsive No Nut November countdown and day-by-day calendar. Built with plain HTML, CSS, and JavaScript—no frameworks, build tools, external fonts, analytics, or third-party scripts.
 
 **Live site:** https://yurisxx.github.io/nnn-countdown/
 
 ## Features
 
-- **Automatic yearly countdown.** Before November, counts down to November 1 at 00:00 UTC. During November, counts down to December 1 at 00:00 UTC. In December, it moves on to the next year's challenge.
-- **Consistent time zone.** All event boundaries use UTC, so everyone sees the same start and end instant regardless of their local time zone.
-- **Two editable calendars.** The current/upcoming November is shown alongside a past November calendar. The history selector lets you choose any year from 2000 up to the most recent completed challenge year.
-- **Three states per day.** Click a date to cycle through `Unmarked → Success → Failed → Unmarked`. This works before November starts, and past calendars can be filled in manually.
-- **Per-year summaries.** Each calendar counts successful, failed, and unmarked days.
-- **Responsive and accessible.** The layout adapts to narrow screens, calendar cells are buttons with accessible labels, and keyboard focus is visible.
-- **No server or account required.** Calendar entries stay in the visitor's browser.
+- **Automatic yearly countdown.** Before November, counts down to November 1 at 00:00 UTC. During November, counts down to December 1 at 00:00 UTC. In December, it advances to the next year's challenge.
+- **Fixed UTC boundaries.** Every visitor sees the same start and end instant, regardless of local time zone.
+- **English and Russian interface.** Use the EN / RU switch in the top-right corner. The choice is remembered in the current browser.
+- **Current and historical calendars.** The current/upcoming November appears alongside a past November. Choose a previous year from the selector (2000 through the most recently completed challenge year).
+- **Context menu for each day.** Click a calendar date to open a menu beside it, then choose **Success**, **Failed**, or **Unmarked**. Click outside the menu or press Escape to dismiss it. Keyboard users can navigate the menu with the arrow keys, Home, and End.
+- **Editable ahead of time.** You can mark days before November starts or fill in past years manually; the site never assigns a result automatically.
+- **Per-year summaries.** Each calendar counts success, failed, and unmarked days.
+- **Responsive layout.** Calendars stack on narrow screens and the day menu stays within the visible viewport.
+- **Local-only data.** No account or server is needed, and calendar entries are never uploaded.
 
-## How calendar data is stored
+## Calendar data and privacy
 
-The calendar uses the browser's `localStorage`, with a separate key for each year (for example, `nnn-calendar:v1:2026`). Each key stores the 30 daily states as a small JSON array.
+Daily statuses use the browser's `localStorage`, with one key per year (for example, `nnn-calendar:v1:2026`). Each key stores an array of 30 values: `unmarked`, `success`, or `failed`.
 
-This is local-only storage:
-- Entries persist across page reloads in the same browser profile.
-- Entries are **not** sent to GitHub or any other server.
-- Different browsers and devices have separate data; there is no synchronization or account system.
-- Clearing site/browser data can erase the calendar.
-- Private browsing or browser settings may block persistent storage. The page displays a note if storage is unavailable.
+The language preference is stored separately under `nnn-language:v1`.
+
+- Data persists across reloads in the same browser profile.
+- Data is not sent to GitHub or any other server.
+- Browsers and devices do not share data; there is no synchronization or account system.
+- Clearing site/browser data can erase saved entries.
+- Private browsing or browser settings may block persistent storage. The page displays a notice if saving is unavailable.
 
 ## Run locally
 
-No build step is needed. Open `index.html` in a browser, or serve the folder with any static file server. For example, with Python installed:
+No build step is required. Open `index.html` in a browser, or run a local static server. For example, with Python installed:
 
 ```sh
 python3 -m http.server 8000
 ```
 
-Then open http://localhost:8000.
+Then visit http://localhost:8000.
 
 ## Deploy on GitHub Pages
 
 1. Open **Settings → Pages** in the repository.
-2. Under **Build and deployment**, select **Deploy from a branch**.
+2. Under **Build and deployment**, choose **Deploy from a branch**.
 3. Select branch `main` and folder `/ (root)`, then save.
-4. After the deployment finishes, open https://yurisxx.github.io/nnn-countdown/.
+4. Wait for deployment, then open https://yurisxx.github.io/nnn-countdown/.
 
-Because this is a static site, there is no build command or output directory.
+This is a static site: there is no build command or output directory.
 
 ## Project structure
 
-- `index.html` — markup, styles, countdown logic, calendar UI, and local storage.
+- `index.html` — page markup, styles, countdown logic, bilingual interface, calendar menus, and local storage.
 
-## Implementation notes
+## Date logic
 
-The event start is November 1 at 00:00 UTC, and the event end is December 1 at 00:00 UTC. JavaScript calculates the relevant year from the current UTC date; no yearly code edit is needed. The calendar itself can be marked any time and does not automatically decide success or failure based on the current date.
+- Challenge start: November 1 at 00:00:00 UTC.
+- Challenge end: December 1 at 00:00:00 UTC.
+- The countdown chooses the appropriate year from the current UTC date automatically.
+- The calendar's chosen statuses are user-entered notes, not an automatic judgement.
 
-There is no license file yet; add a license if you want to explicitly grant reuse permissions.
+## License
+
+No license file is included yet. Add one if you want to explicitly permit reuse of the project.
