@@ -130,7 +130,14 @@
       font-size: 13px;
     }
     select:focus-visible, button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
-    .weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+    .weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-rows: repeat(6, 62px);
+      gap: 6px;
+      align-content: start;
+    }
     .weekdays { margin-bottom: 6px; color: var(--muted); font-size: 10px; text-align: center; }
     .weekday { padding: 4px 0; }
     .calendar-empty { min-width: 0; }
@@ -209,6 +216,7 @@
       .timestamp { font-size: 11px; }
       .calendar-panel { padding: 12px 8px; }
       .weekdays, .calendar-grid { gap: 4px; }
+      .calendar-grid { grid-template-rows: repeat(6, 49px); }
       .day { min-height: 49px; padding: 5px; }
       .day-number { font-size: 11px; }
       .day-status { font-size: 13px; }
