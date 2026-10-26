@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101010">
   <meta name="description" content="A simple No Nut November countdown and private, local day-by-day log.">
-  <title>Недрочабрь — Отсчёт</title>
+  <title>Недрочабрь - Отсчёт</title>
   <style>
     :root {
       color-scheme: dark;
@@ -52,13 +52,6 @@
       cursor: pointer;
     }
     .language-button[aria-pressed="true"] { background: #303030; color: var(--text); }
-    .year {
-      margin: 0 0 14px;
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 650;
-      letter-spacing: .14em;
-    }
     h1 {
       margin: 0;
       font-size: clamp(34px, 7vw, 64px);
@@ -263,7 +256,6 @@
     </div>
 
     <header>
-      <p class="year" id="year">NNN</p>
       <h1 id="main-heading">No Nut November</h1>
       <p class="phase" id="phase">Starts in</p>
       <div class="countdown" id="countdown" role="timer" aria-live="off" aria-label="Time until No Nut November">
@@ -978,7 +970,6 @@
         const minutes = Math.floor((secondsLeft % 3600) / 60);
         const seconds = secondsLeft % 60;
 
-        $("year").textContent = t().challengeName + " · " + event.year;
         $("phase").textContent = t()[event.phaseKey];
         $("days").textContent = pad(days, 3);
         $("hours").textContent = pad(hours);
@@ -990,7 +981,7 @@
         $("timestamp").dateTime = targetDate.toISOString();
         $("timestamp").textContent = formattedTarget;
         $("countdown").setAttribute("aria-label", t().countdownAria(t()[event.phaseKey], event.year, formattedTarget));
-        document.title = t().challengeName + " " + event.year + " — " + t().pageTitle;
+        document.title = t().challengeName + " - " + t().pageTitle;
 
         const localDate = new Date(now);
         const localDateKey = localDate.getFullYear() + "-" +
