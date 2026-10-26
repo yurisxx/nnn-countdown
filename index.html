@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101010">
-  <meta name="description" content="Countdown to No Nut November 2026.">
-  <title>NNN 2026 — Countdown</title>
+  <meta name="description" content="Countdown to No Nut November.">
+  <title>NNN — Countdown</title>
   <style>
     :root {
       color-scheme: dark;
@@ -42,6 +42,12 @@
       font-weight: 750;
       letter-spacing: -.055em;
       line-height: 1.05;
+    }
+    .phase {
+      margin: 32px 0 -22px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .04em;
     }
     .countdown {
       display: grid;
@@ -83,33 +89,67 @@
 </head>
 <body>
   <main>
-    <p class="year">NNN · 2026</p>
+    <p class="year" id="year">NNN</p>
     <h1>No Nut November</h1>
-    <div class="countdown" role="timer" aria-live="off" aria-label="Time until November 1, 2026 at 00:00 UTC">
+    <p class="phase" id="phase">Starts in</p>
+    <div class="countdown" id="countdown" role="timer" aria-live="off" aria-label="Time until No Nut November">
       <div><span class="number" id="days">000</span><span class="label">Days</span></div>
       <div><span class="number" id="hours">00</span><span class="label">Hours</span></div>
       <div><span class="number" id="minutes">00</span><span class="label">Minutes</span></div>
       <div><span class="number" id="seconds">00</span><span class="label">Seconds</span></div>
     </div>
-    <p class="timestamp" id="timestamp"><time datetime="2026-11-01T00:00:00Z">2026-11-01 00:00:00 UTC</time></p>
+    <p class="timestamp"><time id="timestamp" datetime="2026-11-01T00:00:00.000Z">2026-11-01 00:00:00 UTC</time></p>
   </main>
   <script>
     (() => {
-      // One fixed instant for everyone: November 1, 2026 at 00:00 UTC.
-      const start = Date.UTC(2026, 10, 1, 0, 0, 0);
       const $ = (id) => document.getElementById(id);
       const pad = (value, width = 2) => String(value).padStart(width, "0");
 
-      function tick() {
-        const remaining = Math.floor((start - Date.now()) / 1000);
-        const total = Math.abs(remaining);
-        $("days").textContent = pad(Math.floor(total / 86400), 3);
-        $("hours").textContent = pad(Math.floor((total % 86400) / 3600));
-        $("minutes").textContent = pad(Math.floor((total % 3600) / 60));
-        $("seconds").textContent = pad(total % 60);
+      function getEvent(now) {
+        const date = new Date(now);
+        const year = date.getUTCFullYear();
+        const start = Date.UTC(year, 10, 1, 0, 0, 0);
+        const end = Date.UTC(year, 11, 1, 0, 0, 0);
 
-        const mode = remaining >= 0 ? "Countdown" : "Elapsed";
-        document.title = `${pad(Math.floor(total / 86400), 3)}d ${pad(Math.floor((total % 86400) / 3600))}h — NNN 2026 ${mode}`;
+        if (now < start) {
+          return { year, target: start, phase: "Starts in" };
+        }
+        if (now < end) {
+          return { year, target: end, phase: "Ends in" };
+        }
+        return {
+          year: year + 1,
+          target: Date.UTC(year + 1, 10, 1, 0, 0, 0),
+          phase: "Starts in"
+        };
+      }
+
+      function tick() {
+        const now = Date.now();
+        const event = getEvent(now);
+        const secondsLeft = Math.max(0, Math.floor((event.target - now) / 1000));
+        const days = Math.floor(secondsLeft / 86400);
+        const hours = Math.floor((secondsLeft % 86400) / 3600);
+        const minutes = Math.floor((secondsLeft % 3600) / 60);
+        const seconds = secondsLeft % 60;
+
+        $("year").textContent = `NNN · ${event.year}`;
+        $("phase").textContent = event.phase;
+        $("days").textContent = pad(days, 3);
+        $("hours").textContent = pad(hours);
+        $("minutes").textContent = pad(minutes);
+        $("seconds").textContent = pad(seconds);
+
+        const targetDate = new Date(event.target);
+        const formattedTarget =
+          `${targetDate.getUTCFullYear()}-${pad(targetDate.getUTCMonth() + 1)}-${pad(targetDate.getUTCDate())} 00:00:00 UTC`;
+        $("timestamp").dateTime = targetDate.toISOString();
+        $("timestamp").textContent = formattedTarget;
+        $("countdown").setAttribute(
+          "aria-label",
+          `${event.phase} No Nut November ${event.year}, target ${formattedTarget}`
+        );
+        document.title = `NNN ${event.year} — ${event.phase}`;
       }
 
       tick();
