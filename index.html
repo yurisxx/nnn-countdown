@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101010">
   <meta name="description" content="A simple No Nut November countdown and private, local day-by-day log.">
-  <title>NNN — Countdown</title>
+  <title>Недрочабрь — Отсчёт</title>
   <style>
     :root {
       color-scheme: dark;
@@ -378,6 +378,7 @@
         en: {
           pageTitle: "Countdown",
           language: "Language",
+          challengeName: "NNN",
           heading: "No Nut November",
           phaseStart: "Starts in",
           phaseEnd: "Ends in",
@@ -423,7 +424,8 @@
         ru: {
           pageTitle: "Отсчёт",
           language: "Язык",
-          heading: "No Nut November",
+          challengeName: "Недрочабрь",
+          heading: "Недрочабрь",
           phaseStart: "До начала",
           phaseEnd: "До конца",
           days: "Дней", hours: "Часов", minutes: "Минут", seconds: "Секунд",
@@ -431,7 +433,7 @@
           calendarDescription: "Нажми на дату, чтобы выбрать статус.",
           thisYearNovember: "Ноябрь этого года",
           nextYearNovember: "Ноябрь следующего года",
-          pastKicker: "Предыдущий NNN",
+          pastKicker: "Прошлый Недрочабрь",
           chooseYear: "Выбрать прошлый ноябрь",
           weekdays: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
           unmarked: "Не отмечено", success: "Успех", failed: "Провал",
@@ -463,7 +465,7 @@
           importSuccess: (count, cleared) => "Импортировано годов: " + count + "." + (cleared ? " Очищено отметок будущих дат: " + cleared + "." : ""),
           importInvalid: "Этот файл не является корректной резервной копией NNN Countdown.",
           importFailed: "Не удалось импортировать данные. Возможно, хранилище браузера недоступно; имеющиеся данные по возможности сохранены.",
-          countdownAria: (phase, year, date) => phase + " до No Nut November " + year + ", дата: " + date
+          countdownAria: (phase, year, date) => phase + " до Недрочабря " + year + ", дата: " + date
         }
       };
 
@@ -976,7 +978,7 @@
         const minutes = Math.floor((secondsLeft % 3600) / 60);
         const seconds = secondsLeft % 60;
 
-        $("year").textContent = "NNN · " + event.year;
+        $("year").textContent = t().challengeName + " · " + event.year;
         $("phase").textContent = t()[event.phaseKey];
         $("days").textContent = pad(days, 3);
         $("hours").textContent = pad(hours);
@@ -988,7 +990,7 @@
         $("timestamp").dateTime = targetDate.toISOString();
         $("timestamp").textContent = formattedTarget;
         $("countdown").setAttribute("aria-label", t().countdownAria(t()[event.phaseKey], event.year, formattedTarget));
-        document.title = "NNN " + event.year + " — " + t().pageTitle;
+        document.title = t().challengeName + " " + event.year + " — " + t().pageTitle;
 
         const localDate = new Date(now);
         const localDateKey = localDate.getFullYear() + "-" +
