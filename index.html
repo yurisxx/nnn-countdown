@@ -615,7 +615,7 @@
 
       function renderStats(now = new Date()) {
         const year = now.getFullYear();
-        const elapsedDays = now.getMonth() < 10 ? 0 : now.getMonth() > 10 ? 30 : now.getDate();
+        const elapsedDays = now.getMonth() < 10 ? 0 : now.getMonth() > 10 ? 30 : now.getDate() - 1;
         const pastStatuses = readStatuses(year).slice(0, elapsedDays);
         const successes = pastStatuses.filter((state) => state === "success").length;
         const failures = pastStatuses.filter((state) => state === "failed").length;
