@@ -59,7 +59,7 @@
       letter-spacing: -.055em;
       line-height: 1.05;
     }
-    .phase { margin: 32px 0 -22px; color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+    .phase { margin: 32px 0 -22px; color: var(--accent); font-size: 12px; letter-spacing: .04em; }
     .countdown {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -69,6 +69,7 @@
     }
     .number {
       display: block;
+      color: var(--accent);
       font-size: clamp(30px, 7vw, 62px);
       font-weight: 650;
       line-height: 1;
@@ -163,6 +164,7 @@
     .day.failed { border-color: #704047; background: var(--failure-bg); }
     .day.failed .day-status { color: var(--failure); }
     .summary { min-height: 20px; margin: 14px 0 0; color: #bdbdbd; font-size: 11px; line-height: 1.6; font-variant-numeric: tabular-nums; }
+    .summary .failure-text { color: var(--accent); }
     .stats-section { margin-top: 30px; padding-top: 24px; border-top: 1px solid var(--line); }
     .stats-heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
     .stats-year { color: var(--accent); font: 600 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
@@ -384,7 +386,11 @@
           weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
           unmarked: "Unmarked", success: "Success", failed: "Failed",
           menuLabel: "Set day status",
-          summary: (success, failed, unmarked) => success + " success · " + failed + " failed · " + unmarked + " unmarked",
+          summary: (success, failed, unmarked) => ({
+            success: success + " success",
+            failed: failed + " failed",
+            unmarked: unmarked + " unmarked"
+          }),
           storageOk: "Marks are saved in this browser only (localStorage). They are not uploaded to a server. Clearing browser data may erase them.",
           storageBlocked: "Browser storage is unavailable or blocked. Marks may last only until this page is closed.",
           dateLabel: (day, year, state) => "November " + day + ", " + year + ": " + state + ". Choose a status.",
@@ -430,7 +436,11 @@
           weekdays: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
           unmarked: "Не отмечено", success: "Успех", failed: "Провал",
           menuLabel: "Статус дня",
-          summary: (success, failed, unmarked) => "Успехов: " + success + " · Провалов: " + failed + " · Не отмечено: " + unmarked,
+          summary: (success, failed, unmarked) => ({
+            success: "Успехов: " + success,
+            failed: "Провалов: " + failed,
+            unmarked: "Не отмечено: " + unmarked
+          }),
           storageOk: "Отметки хранятся только в этом браузере (localStorage) и не отправляются на сервер. Очистка данных браузера может их удалить.",
           storageBlocked: "Хранилище браузера недоступно или заблокировано. Отметки могут пропасть после закрытия страницы.",
           dateLabel: (day, year, state) => day + " ноября " + year + ": " + state + ". Выбери статус.",
@@ -745,7 +755,16 @@
         const success = statuses.filter((state) => state === "success").length;
         const failed = statuses.filter((state) => state === "failed").length;
         const unmarked = 30 - success - failed;
-        $(summaryId).textContent = t().summary(success, failed, unmarked);
+        const summary = $(summaryId);
+        const summaryParts = t().summary(success, failed, unmarked);
+        summary.replaceChildren();
+        [summaryParts.success, summaryParts.failed, summaryParts.unmarked].forEach((text, index) => {
+          if (index > 0) summary.appendChild(document.createTextNode(" · "));
+          const part = document.createElement("span");
+          if (index === 1) part.className = "failure-text";
+          part.textContent = text;
+          summary.appendChild(part);
+        });
         const ariaLabel = t().calendarAria(year);
         grid.setAttribute("aria-label", ariaLabel);
         updateStorageNote();
