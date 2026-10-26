@@ -159,6 +159,8 @@
       transition: background-color .12s, border-color .12s;
     }
     .day:hover { border-color: #777; }
+    .day:disabled { cursor: not-allowed; opacity: .38; }
+    .day:disabled:hover { border-color: #343434; }
     .day-number { font-size: 12px; font-variant-numeric: tabular-nums; }
     .day-status { align-self: flex-end; color: var(--muted); font-size: 15px; line-height: 1; }
     .day.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
@@ -394,6 +396,8 @@
           storageBlocked: "Browser storage is unavailable or blocked. Marks may last only until this page is closed.",
           dateLabel: (day, year, state) => "November " + day + ", " + year + ": " + state + ". Choose a status.",
           dateTitle: (day, year, state) => "November " + day + ", " + year + " — " + state + ".",
+          futureDateLabel: (day, year) => "November " + day + ", " + year + ": future date, not available to mark yet.",
+          futureDateTitle: (day, year) => "November " + day + ", " + year + " — this date cannot be marked yet.",
           calendarAria: (year) => "November " + year + " calendar",
           statsTitle: "Challenge statistics",
           statSuccesses: "Successful days",
@@ -410,8 +414,8 @@
           exportNoData: "No saved calendars to export yet. Mark a day first.",
           exportSuccess: "Calendar backup downloaded.",
           exportFailed: "Could not read saved calendars. Browser storage may be blocked.",
-          importConfirm: (years) => "Import marks for " + years + "? Existing marks for these years will be replaced. Other years will stay unchanged.",
-          importSuccess: (count) => "Imported " + count + (count === 1 ? " year." : " years."),
+          importConfirm: (years) => "Import marks for " + years + "? Existing marks for these years will be replaced. Other years will stay unchanged. Marks for future dates will be cleared.",
+          importSuccess: (count, cleared) => "Imported " + count + (count === 1 ? " year." : " years.") + (cleared ? " Cleared " + cleared + " future date mark(s)." : ""),
           importInvalid: "This file is not a valid NNN Countdown backup.",
           importFailed: "Import failed. Browser storage may be unavailable; existing data was kept where possible.",
           countdownAria: (phase, year, date) => phase + " No Nut November " + year + ", target " + date
@@ -437,6 +441,8 @@
           storageBlocked: "Хранилище браузера недоступно или заблокировано. Отметки могут пропасть после закрытия страницы.",
           dateLabel: (day, year, state) => day + " ноября " + year + ": " + state + ". Выбери статус.",
           dateTitle: (day, year, state) => day + " ноября " + year + " — " + state + ".",
+          futureDateLabel: (day, year) => day + " ноября " + year + ": эту дату пока нельзя отметить.",
+          futureDateTitle: (day, year) => day + " ноября " + year + " — пока нельзя отметить эту дату.",
           calendarAria: (year) => "Календарь ноября " + year,
           statsTitle: "Статистика испытания",
           statSuccesses: "Успешные дни",
@@ -453,8 +459,8 @@
           exportNoData: "Пока нечего экспортировать. Сначала отметь хотя бы один день.",
           exportSuccess: "Резервная копия календаря скачана.",
           exportFailed: "Не удалось прочитать сохранённые календари. Возможно, хранилище браузера заблокировано.",
-          importConfirm: (years) => "Импортировать отметки за " + years + "? Данные этих лет будут заменены; остальные годы не изменятся.",
-          importSuccess: (count) => "Импортировано годов: " + count + ".",
+          importConfirm: (years) => "Импортировать отметки за " + years + "? Данные этих лет будут заменены; остальные годы не изменятся. Отметки будущих дат будут очищены.",
+          importSuccess: (count, cleared) => "Импортировано годов: " + count + "." + (cleared ? " Очищено отметок будущих дат: " + cleared + "." : ""),
           importInvalid: "Этот файл не является корректной резервной копией NNN Countdown.",
           importFailed: "Не удалось импортировать данные. Возможно, хранилище браузера недоступно; имеющиеся данные по возможности сохранены.",
           countdownAria: (phase, year, date) => phase + " до No Nut November " + year + ", дата: " + date
@@ -466,6 +472,7 @@
       let renderedEventYear = null;
       let historyOptionsEventYear = null;
       let activeDay = null;
+      let lastLocalDateKey = null;
       const menu = $("day-menu");
 
       try {
@@ -504,11 +511,33 @@
           " UTC" + sign + pad(offsetHours) + ":" + pad(offsetRemainder);
       }
 
+      function isFutureDay(year, day, now = new Date()) {
+        const candidate = new Date(year, 10, day);
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        return candidate.getTime() > today.getTime();
+      }
+
+      function clearFutureMarks(year, statuses, now = new Date()) {
+        const normalized = Array.from({ length: 30 }, (_, index) =>
+          validStates.has(statuses[index]) ? statuses[index] : "unmarked"
+        );
+        let cleared = 0;
+        for (let day = 1; day <= 30; day += 1) {
+          const index = day - 1;
+          if (isFutureDay(year, day, now) && normalized[index] !== "unmarked") {
+            normalized[index] = "unmarked";
+            cleared += 1;
+          }
+        }
+        return { statuses: normalized, cleared };
+      }
+
       function readStatuses(year) {
         if (stateCache.has(year)) return stateCache.get(year);
         const statuses = Array(30).fill("unmarked");
+        const storageKey = "nnn-calendar:v1:" + year;
         try {
-          const saved = window.localStorage.getItem("nnn-calendar:v1:" + year);
+          const saved = window.localStorage.getItem(storageKey);
           if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed)) {
@@ -520,8 +549,16 @@
         } catch {
           storageAvailable = false;
         }
-        stateCache.set(year, statuses);
-        return statuses;
+        const normalized = clearFutureMarks(year, statuses);
+        stateCache.set(year, normalized.statuses);
+        if (normalized.cleared > 0) {
+          try {
+            window.localStorage.setItem(storageKey, JSON.stringify(normalized.statuses));
+          } catch {
+            storageAvailable = false;
+          }
+        }
+        return normalized.statuses;
       }
 
       function updateStorageNote() {
@@ -590,6 +627,10 @@
       }
 
       function openDayMenu(event, year, day, gridId, summaryId, cell) {
+        if (isFutureDay(year, day)) {
+          closeDayMenu(false);
+          return;
+        }
         event.preventDefault();
         const rect = cell.getBoundingClientRect();
         const x = event.detail === 0 ? rect.left + rect.width / 2 : event.clientX;
@@ -612,17 +653,15 @@
         if (firstOption) firstOption.focus();
       }
 
-      function renderStats(now = new Date()) {
-        const year = now.getFullYear();
-        const elapsedDays = now.getMonth() < 10 ? 0 : now.getMonth() > 10 ? 30 : now.getDate() - 1;
-        const pastStatuses = readStatuses(year).slice(0, elapsedDays);
-        const successes = pastStatuses.filter((state) => state === "success").length;
-        const failures = pastStatuses.filter((state) => state === "failed").length;
+      function calculateStats(statuses, elapsedDays) {
+        const completed = statuses.slice(0, elapsedDays);
+        const successes = completed.filter((state) => state === "success").length;
+        const failures = completed.filter((state) => state === "failed").length;
         const marked = successes + failures;
-
         let longestStreak = 0;
         let runningStreak = 0;
-        for (const state of pastStatuses) {
+
+        for (const state of completed) {
           if (state === "success") {
             runningStreak += 1;
             longestStreak = Math.max(longestStreak, runningStreak);
@@ -632,17 +671,31 @@
         }
 
         let currentStreak = 0;
-        for (let index = pastStatuses.length - 1; index >= 0; index -= 1) {
-          const state = pastStatuses[index];
+        for (let index = completed.length - 1; index >= 0; index -= 1) {
+          const state = completed[index];
           if (state === "failed") break;
           if (state === "success") currentStreak += 1;
         }
 
-        $("stats-successes").textContent = String(successes);
-        $("stats-marked-detail").textContent = t().markedDays(marked);
-        $("stats-current-streak").textContent = t().dayCount(currentStreak);
-        $("stats-longest-streak").textContent = t().dayCount(longestStreak);
-        $("stats-success-rate").textContent = marked ? Math.round((successes / marked) * 100) + "%" : "—";
+        return {
+          successes,
+          marked,
+          currentStreak,
+          longestStreak,
+          successRate: marked ? Math.round((successes / marked) * 100) : null
+        };
+      }
+
+      function renderStats(now = new Date()) {
+        const year = now.getFullYear();
+        const elapsedDays = now.getMonth() < 10 ? 0 : now.getMonth() > 10 ? 30 : now.getDate() - 1;
+        const stats = calculateStats(readStatuses(year), elapsedDays);
+
+        $("stats-successes").textContent = String(stats.successes);
+        $("stats-marked-detail").textContent = t().markedDays(stats.marked);
+        $("stats-current-streak").textContent = t().dayCount(stats.currentStreak);
+        $("stats-longest-streak").textContent = t().dayCount(stats.longestStreak);
+        $("stats-success-rate").textContent = stats.successRate === null ? "—" : stats.successRate + "%";
       }
 
       function renderCalendar(year, gridId, summaryId) {
@@ -658,12 +711,14 @@
           grid.appendChild(empty);
         }
 
+        const today = new Date();
         for (let day = 1; day <= 30; day += 1) {
           const state = statuses[day - 1];
+          const future = isFutureDay(year, day, today);
           const button = document.createElement("button");
           button.type = "button";
           button.className = "day " + state;
-          const today = new Date();
+          button.disabled = future;
           if (year === today.getFullYear() && today.getMonth() === 10 && day === today.getDate()) {
             button.classList.add("today");
             button.setAttribute("aria-current", "date");
@@ -672,8 +727,12 @@
           button.setAttribute("aria-haspopup", "menu");
           button.setAttribute("aria-expanded", "false");
           button.setAttribute("aria-controls", "day-menu");
-          button.setAttribute("aria-label", t().dateLabel(day, year, t()[state].toLowerCase()));
-          button.title = t().dateTitle(day, year, t()[state].toLowerCase());
+          button.setAttribute("aria-label", future
+            ? t().futureDateLabel(day, year)
+            : t().dateLabel(day, year, t()[state].toLowerCase()));
+          button.title = future
+            ? t().futureDateTitle(day, year)
+            : t().dateTitle(day, year, t()[state].toLowerCase());
 
           const number = document.createElement("span");
           number.className = "day-number";
@@ -683,7 +742,9 @@
           marker.setAttribute("aria-hidden", "true");
           marker.textContent = stateSymbols[state];
           button.append(number, marker);
-          button.addEventListener("click", (event) => openDayMenu(event, year, day, gridId, summaryId, button));
+          if (!future) {
+            button.addEventListener("click", (event) => openDayMenu(event, year, day, gridId, summaryId, button));
+          }
           grid.appendChild(button);
         }
 
@@ -727,6 +788,10 @@
 
       function selectDayStatus(state) {
         if (!activeDay || !validStates.has(state)) return;
+        if (isFutureDay(activeDay.year, activeDay.day)) {
+          closeDayMenu(false);
+          return;
+        }
         const selection = { ...activeDay };
         stateCache.get(selection.year)[selection.day - 1] = state;
         saveStatuses(selection.year);
@@ -795,6 +860,8 @@
           }
 
           const incoming = {};
+          const importDate = new Date();
+          let clearedFutureMarks = 0;
           for (const [yearText, statuses] of Object.entries(backup.years)) {
             if (!/^\d{4}$/.test(yearText)) throw new Error("Invalid year");
             const year = Number(yearText);
@@ -802,7 +869,9 @@
                 !statuses.every((state) => validStates.has(state))) {
               throw new Error("Invalid calendar data");
             }
-            incoming[yearText] = statuses.slice();
+            const normalized = clearFutureMarks(year, statuses, importDate);
+            incoming[yearText] = normalized.statuses;
+            clearedFutureMarks += normalized.cleared;
           }
           const years = Object.keys(incoming).sort();
           if (years.length === 0) throw new Error("No calendars found");
@@ -831,8 +900,10 @@
 
           for (const year of years) stateCache.set(Number(year), incoming[year]);
           if (renderedEventYear !== null) renderCalendars(renderedEventYear, false);
+          storageAvailable = true;
+          updateStorageNote();
           renderStats(new Date());
-          window.alert(t().importSuccess(years.length));
+          window.alert(t().importSuccess(years.length, clearedFutureMarks));
         } catch (error) {
           if (error instanceof SyntaxError || (error && ["Invalid backup format", "Invalid year", "Invalid calendar data", "No calendars found"].includes(error.message))) {
             window.alert(t().importInvalid);
@@ -877,6 +948,18 @@
       });
       window.addEventListener("resize", () => { if (!menu.hidden) closeDayMenu(false); });
       window.addEventListener("scroll", () => { if (!menu.hidden) closeDayMenu(false); }, true);
+      window.addEventListener("storage", (event) => {
+        if (event.key === null) {
+          stateCache.clear();
+        } else {
+          const match = event.key.match(/^nnn-calendar:v1:(\d{4})$/);
+          if (!match) return;
+          stateCache.delete(Number(match[1]));
+        }
+        closeDayMenu(false);
+        if (renderedEventYear !== null) renderCalendars(renderedEventYear, false);
+        renderStats(new Date());
+      });
 
       $("history-year").addEventListener("change", () => {
         const year = Number($("history-year").value);
@@ -907,8 +990,20 @@
         $("countdown").setAttribute("aria-label", t().countdownAria(t()[event.phaseKey], event.year, formattedTarget));
         document.title = "NNN " + event.year + " — " + t().pageTitle;
 
-        if (event.year !== renderedEventYear) renderCalendars(event.year, true);
-        renderStats(new Date(now));
+        const localDate = new Date(now);
+        const localDateKey = localDate.getFullYear() + "-" +
+          pad(localDate.getMonth() + 1) + "-" + pad(localDate.getDate());
+        const dayChanged = localDateKey !== lastLocalDateKey;
+
+        if (event.year !== renderedEventYear) {
+          closeDayMenu(false);
+          renderCalendars(event.year, true);
+        } else if (dayChanged) {
+          closeDayMenu(false);
+          renderCalendars(event.year, false);
+        }
+        lastLocalDateKey = localDateKey;
+        renderStats(localDate);
       }
 
       setLanguage(language);
