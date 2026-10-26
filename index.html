@@ -495,6 +495,9 @@
       } catch {
         storageAvailable = false;
       }
+      // An explicit URL language takes priority over this browser's saved preference.
+      const urlLanguage = new URLSearchParams(window.location.search).get("lang");
+      if (urlLanguage === "en" || urlLanguage === "ru") language = urlLanguage;
 
       const t = () => translations[language];
 
@@ -589,7 +592,7 @@
         updateStorageNote();
       }
 
-      function setLanguage(nextLanguage) {
+      function setLanguage(nextLanguage, updateUrl = false) {
         if (nextLanguage !== "en" && nextLanguage !== "ru") return;
         closeDayMenu(false);
         language = nextLanguage;
@@ -623,6 +626,11 @@
           window.localStorage.setItem("nnn-language:v1", language);
         } catch {
           storageAvailable = false;
+        }
+        if (updateUrl) {
+          const url = new URL(window.location.href);
+          url.searchParams.set("lang", language);
+          window.history.replaceState(null, "", url);
         }
         if (renderedEventYear !== null) renderCalendars(renderedEventYear, false);
         updateStorageNote();
@@ -945,7 +953,7 @@
       });
 
       document.querySelectorAll("[data-language]").forEach((button) => {
-        button.addEventListener("click", () => setLanguage(button.dataset.language));
+        button.addEventListener("click", () => setLanguage(button.dataset.language, true));
       });
       menu.querySelectorAll("[data-state]").forEach((option) => {
         option.addEventListener("click", () => selectDayStatus(option.dataset.state));
